@@ -28,7 +28,7 @@ impl Nation {
     Ok(Nation { polygons })
   }
 
-  fn to_vertex_groups(&self, color: Color, bounds: Rect<i32>) -> Vec<Vec<Vertex>> {
+  fn to_vertex_groups(&self, color: Color, bounds: Rect<f64>) -> Vec<Vec<Vertex>> {
     let mut vertex_groups = Vec::new();
     let zero = Vector2f::new(0.0, 0.0);
     for polygon in &self.polygons {
@@ -47,12 +47,11 @@ impl Nation {
     vertex_groups
   }
 
-  fn to_vector(point: &Vec<f64>, bounds: Rect<i32>) -> Vector2f {
+  fn to_vector(point: &Vec<f64>, bounds: Rect<f64>) -> Vector2f {
     let latitude = point[0];
     let longitude = point[1];
-    let fbounds = bounds.as_other::<f64>();
-    let x = (latitude + MAX_LATITUDE) * fbounds.width / (2.0 * MAX_LATITUDE);
-    let y = fbounds.height - ((longitude + MAX_LONGITUDE) * fbounds.height / (2.0 * MAX_LONGITUDE));
+    let x = (latitude + MAX_LATITUDE) * bounds.width / (2.0 * MAX_LATITUDE);
+    let y = bounds.height - ((longitude + MAX_LONGITUDE) * bounds.height / (2.0 * MAX_LONGITUDE));
     Vector2f::new(x as f32, y as f32)
   }
 }
@@ -63,7 +62,7 @@ impl Drawable for Nation {
     target: &mut dyn sfml::graphics::RenderTarget,
     states: &sfml::graphics::RenderStates<'texture, 'shader, 'shader_texture>,
   ) {
-    let viewport = target.viewport(target.view());
+    let viewport = target.viewport(target.view()).as_other::<f64>();
     let vertex_groups = self.to_vertex_groups(Color::BLACK, viewport);
     for vertices in vertex_groups {
       target.draw_primitives(vertices.as_slice(), PrimitiveType::LINE_STRIP, states);
