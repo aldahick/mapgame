@@ -6,6 +6,9 @@ use std::{error, fs};
 use crate::errors::MapParseError;
 use crate::nation::Nation;
 
+pub const MAX_LATITUDE: f64 = 180.0;
+pub const MAX_LONGITUDE: f64 = 90.0;
+
 pub struct WorldMap {
   nations: Vec<Nation>,
 }

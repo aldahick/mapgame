@@ -1,13 +1,16 @@
 use geojson::{Feature, Value};
 use sfml::{
-  graphics::{Color, Drawable, Vertex, PrimitiveType},
+  graphics::{Color, Drawable, PrimitiveType, Rect, Vertex},
   system::Vector2f,
 };
 
-use crate::errors::MapParseError;
+use crate::{
+  errors::MapParseError,
+  worldmap::{MAX_LATITUDE, MAX_LONGITUDE},
+};
 
 pub struct Nation {
-  vertex_groups: Vec<Vec<Vertex>>,
+  polygons: Vec<Vec<Vec<Vec<f64>>>>,
 }
 
 impl Nation {
@@ -22,26 +25,35 @@ impl Nation {
     } else if let Value::MultiPolygon(multi) = geometry.value {
       polygons.extend(multi);
     }
-    let vertex_groups = Nation::to_vertex_groups(polygons, Color::BLACK);
-    Ok(Nation { vertex_groups })
+    Ok(Nation { polygons })
   }
 
-  fn to_vertex_groups(polygons: Vec<Vec<Vec<Vec<f64>>>>, color: Color) -> Vec<Vec<Vertex>> {
+  fn to_vertex_groups(&self, color: Color, bounds: Rect<i32>) -> Vec<Vec<Vertex>> {
     let mut vertex_groups = Vec::new();
     let zero = Vector2f::new(0.0, 0.0);
-    for polygon in polygons {
+    for polygon in &self.polygons {
       // see: https://stevage.github.io/geojson-spec/#section-3.1.6
       for linear_ring in polygon {
         let mut vertex_group = Vec::new();
         if let Some((_last, points)) = linear_ring.as_slice().split_last() {
           for point in points {
-            vertex_group.push(Vertex::new(Vector2f::new(point[0] as f32, point[1] as f32), color, zero));
+            let vector = Nation::to_vector(point, bounds);
+            vertex_group.push(Vertex::new(vector, color, zero));
           }
         }
         vertex_groups.push(vertex_group);
       }
     }
     vertex_groups
+  }
+
+  fn to_vector(point: &Vec<f64>, bounds: Rect<i32>) -> Vector2f {
+    let latitude = point[0];
+    let longitude = point[1];
+    let fbounds = bounds.as_other::<f64>();
+    let x = (latitude + MAX_LATITUDE) * fbounds.width / (2.0 * MAX_LATITUDE);
+    let y = fbounds.height - ((longitude + MAX_LONGITUDE) * fbounds.height / (2.0 * MAX_LONGITUDE));
+    Vector2f::new(x as f32, y as f32)
   }
 }
 
@@ -51,7 +63,9 @@ impl Drawable for Nation {
     target: &mut dyn sfml::graphics::RenderTarget,
     states: &sfml::graphics::RenderStates<'texture, 'shader, 'shader_texture>,
   ) {
-    for vertices in &self.vertex_groups {
+    let viewport = target.viewport(target.view());
+    let vertex_groups = self.to_vertex_groups(Color::BLACK, viewport);
+    for vertices in vertex_groups {
       target.draw_primitives(vertices.as_slice(), PrimitiveType::LINE_STRIP, states);
     }
   }
