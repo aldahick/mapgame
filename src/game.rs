@@ -4,7 +4,7 @@ use sfml::{
   window::{Event, Style},
 };
 
-use crate::worldmap::WorldMap;
+use crate::world_map::types::WorldMap;
 
 pub struct Game {
   window: RenderWindow,

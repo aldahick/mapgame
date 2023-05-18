@@ -1,8 +1,8 @@
-mod errors;
-mod game;
-mod math;
-mod nation;
-mod worldmap;
+pub mod errors;
+pub mod game;
+pub mod math;
+pub mod nation;
+pub mod world_map;
 
 use game::Game;
 
