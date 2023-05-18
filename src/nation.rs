@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use geojson::{Feature, Value};
 use sfml::{
@@ -8,7 +8,7 @@ use sfml::{
 
 use crate::{
   errors::MapParseError,
-  math::{polygon_contains, polygon_area},
+  math::{polygon_area, polygon_contains},
   worldmap::{Bounds, GeoPolygons, VectorPolygons, WorldMap},
 };
 

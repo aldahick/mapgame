@@ -16,8 +16,7 @@ const MAP_PATH: &str = "./geo/countries.geojson";
 impl Game {
   pub fn new() -> Game {
     let world_map = WorldMap::new(MAP_PATH.to_string()).expect("Failed to load map from file");
-    let mut window =
-      RenderWindow::new((1920, 1080), "mapwar", Style::CLOSE, &Default::default());
+    let mut window = RenderWindow::new((1920, 1080), "mapwar", Style::CLOSE, &Default::default());
     window.set_framerate_limit(60);
     Game { window, world_map }
   }
@@ -46,7 +45,9 @@ impl Game {
 
   fn on_resize(&mut self, width: f64, height: f64) {
     let bounds = Rect::new(0.0, 0.0, width as f32, height as f32);
-    self.window.set_view(&View::from_rect(bounds.as_other::<f32>()));
+    self
+      .window
+      .set_view(&View::from_rect(bounds.as_other::<f32>()));
     for (_id, nation) in self.world_map.nations.iter_mut() {
       nation.on_resize(bounds);
     }
