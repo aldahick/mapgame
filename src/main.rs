@@ -1,5 +1,6 @@
 mod errors;
 mod game;
+mod math;
 mod nation;
 mod worldmap;
 
