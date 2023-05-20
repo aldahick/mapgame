@@ -1,14 +1,21 @@
 use sfml::system::Vector2f;
 
+use crate::nation::types::Nations;
+
 use super::types::WorldMap;
 
 impl WorldMap {
-  pub fn set_highlight(&mut self, position: Vector2f) {
-    let target_id_opt = self.find_nation_id_at(position);
-    self.highlighted_nation_id = target_id_opt.clone();
-    let target_id = target_id_opt.unwrap_or_default();
-    for (id, nation) in self.nations.iter_mut() {
-      nation.set_highlight(target_id == id.as_str());
+  /* Highlights the nation at `position` and unhighlights all others */
+  pub fn get_highlighted_nation_at(nations: &mut Nations, position: Vector2f) -> Option<String> {
+    let mut highlighted_id = None;
+    for (id, nation) in nations {
+      if nation.includes(position) {
+        highlighted_id = Some(id.to_string());
+        nation.set_highlight(true);
+      } else {
+        nation.set_highlight(false);
+      }
     }
+    highlighted_id
   }
 }

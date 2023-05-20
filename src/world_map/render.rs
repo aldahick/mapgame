@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use sfml::{
   graphics::{Rect, RenderTarget, RenderWindow},
   system::Vector2f,
@@ -35,12 +37,12 @@ impl WorldMap {
     let highlight_id = self.highlighted_nation_id.clone().unwrap_or_default();
     for (id, nation) in &self.nations {
       if id.as_str() != highlight_id {
-        window.draw(nation.as_ref());
+        window.draw(nation.deref());
       }
     }
     let highlight_nation = self.nations.get(highlight_id.as_str());
     if highlight_nation.is_some() {
-      window.draw(highlight_nation.unwrap().as_ref());
+      window.draw(highlight_nation.unwrap().deref());
     }
   }
 

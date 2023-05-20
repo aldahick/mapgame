@@ -14,5 +14,5 @@ pub type VectorPolygons = Vec<Vec<Vector2f>>;
 
 pub struct WorldMap {
   pub nations: Nations,
-  pub(crate) highlighted_nation_id: Option<String>,
+  pub highlighted_nation_id: Option<String>,
 }

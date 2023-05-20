@@ -9,7 +9,7 @@ use crate::{
 use super::types::Nation;
 
 impl Nation {
-  pub fn new(feature: Feature, bounds: Bounds) -> Result<Box<Nation>, MapParseError> {
+  pub fn new<'n>(feature: Feature, bounds: Bounds) -> Result<Box<Nation>, MapParseError> {
     let id = match feature.property("ISO_A3") {
       Some(v) => v.as_str().unwrap(),
       None => "",
@@ -33,7 +33,7 @@ impl Nation {
     for polygon in &vector_polygons {
       vector_total_area += polygon_area(polygon);
     }
-    Ok(Box::new(Nation {
+    let nation = Box::new(Nation {
       id: id.to_string(),
       name: name.to_string(),
       bounds: WorldMap::to_bounds(&vector_polygons),
@@ -41,6 +41,7 @@ impl Nation {
       vector_total_area: f32::abs(vector_total_area / 2.0),
       geo_polygons,
       highlight: false,
-    }))
+    });
+    Ok(nation)
   }
 }

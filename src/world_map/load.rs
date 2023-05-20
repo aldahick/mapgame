@@ -1,7 +1,7 @@
 use std::{collections::HashMap, error, fs};
 
 use geojson::FeatureCollection;
-use sfml::{graphics::Rect, system::Vector2f};
+use sfml::graphics::Rect;
 
 use crate::{
   errors::MapParseError,
@@ -11,7 +11,7 @@ use crate::{
 use super::types::{Bounds, WorldMap, MIN_NATION_AREA};
 
 impl WorldMap {
-  pub fn new(filename: String) -> Result<WorldMap, Box<dyn error::Error>> {
+  pub fn new<'a>(filename: String) -> Result<WorldMap, Box<dyn error::Error>> {
     let geojson_str = match fs::read_to_string(filename) {
       Ok(g) => g,
       Err(e) => return Err(Box::new(e)),
@@ -52,14 +52,5 @@ impl WorldMap {
       }
     }
     Ok(nations)
-  }
-
-  pub fn find_nation_id_at(&self, position: Vector2f) -> Option<String> {
-    for (id, nation) in &self.nations {
-      if nation.includes(position) {
-        return Some(id.to_string());
-      }
-    }
-    None
   }
 }

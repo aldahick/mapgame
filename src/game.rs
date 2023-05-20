@@ -4,11 +4,12 @@ use sfml::{
   window::{Event, Style},
 };
 
-use crate::world_map::types::WorldMap;
+use crate::{player::types::Player, world_map::types::WorldMap};
 
 pub struct Game {
   window: RenderWindow,
   world_map: WorldMap,
+  player: Box<Player>,
 }
 
 const MAP_PATH: &str = "./geo/countries.geojson";
@@ -18,38 +19,58 @@ impl Game {
     let world_map = WorldMap::new(MAP_PATH.to_string()).expect("Failed to load map from file");
     let mut window = RenderWindow::new((1920, 1080), "mapwar", Style::CLOSE, &Default::default());
     window.set_framerate_limit(60);
-    Game { window, world_map }
+    let player = Player::new();
+    Game {
+      window,
+      world_map,
+      player,
+    }
   }
 
   pub fn start(&mut self) {
-    while self.window.is_open() {
-      while let Some(event) = self.window.poll_event() {
-        self.on_event(event);
+    let window = &mut self.window;
+    let world_map = &mut self.world_map;
+    while window.is_open() {
+      while let Some(event) = window.poll_event() {
+        match event {
+          Event::Closed => window.close(),
+          Event::Resized { width, height } => {
+            let bounds = Rect::new(0.0, 0.0, width as f32, height as f32);
+            window.set_view(&View::from_rect(bounds.as_other::<f32>()));
+            let nations = &mut world_map.nations;
+            for (_id, nation) in nations.iter_mut() {
+              nation.on_resize(bounds);
+            }
+          }
+          Event::MouseMoved { x, y } => {
+            let position = Vector2f::new(x as f32, y as f32);
+            let nations = &mut world_map.nations;
+            let new_highlighted_id = WorldMap::get_highlighted_nation_at(nations, position);
+            world_map.highlighted_nation_id = new_highlighted_id;
+          }
+          Event::MouseButtonPressed {
+            button: _,
+            x: _,
+            y: _,
+          } => {
+            if self.player.nation_id.is_none() {
+              let highlighted_id = &world_map.highlighted_nation_id;
+              if highlighted_id.is_some() {
+                self.player.nation_id = highlighted_id.clone();
+                println!(
+                  "SELECTED NATION: {}",
+                  self.player.nation_id.as_ref().unwrap()
+                );
+              }
+            }
+          }
+          _ => {}
+        }
       }
-      self.window.clear(Color::WHITE);
-      self.world_map.render(&mut self.window);
-      self.window.display();
-    }
-  }
-
-  fn on_event(&mut self, event: Event) {
-    match event {
-      Event::Closed => self.window.close(),
-      Event::Resized { width, height } => self.on_resize(width as f64, height as f64),
-      Event::MouseMoved { x, y } => self
-        .world_map
-        .set_highlight(Vector2f::new(x as f32, y as f32)),
-      _ => {}
-    }
-  }
-
-  fn on_resize(&mut self, width: f64, height: f64) {
-    let bounds = Rect::new(0.0, 0.0, width as f32, height as f32);
-    self
-      .window
-      .set_view(&View::from_rect(bounds.as_other::<f32>()));
-    for (_id, nation) in self.world_map.nations.iter_mut() {
-      nation.on_resize(bounds);
+      window.clear(Color::WHITE);
+      world_map.render(window);
+      window.display();
+      self.player = Player::new();
     }
   }
 }
