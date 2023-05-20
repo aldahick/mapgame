@@ -13,6 +13,7 @@ pub type GeoPolygons = Vec<Vec<Vec<Vec<f64>>>>;
 pub type VectorPolygons = Vec<Vec<Vector2f>>;
 
 pub struct WorldMap {
+  pub name: String,
   pub nations: Nations,
   pub highlighted_nation_id: Option<String>,
 }

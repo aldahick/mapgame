@@ -4,11 +4,14 @@ use std::{
 };
 
 #[derive(Debug, Clone)]
-pub struct MapParseError;
+pub struct MapLoadError {
+  pub name: String,
+  pub reason: String,
+}
 
-impl error::Error for MapParseError {}
-impl fmt::Display for MapParseError {
+impl error::Error for MapLoadError {}
+impl fmt::Display for MapLoadError {
   fn fmt<'a>(&self, f: &mut Formatter<'a>) -> fmt::Result {
-    write!(f, "failed to parse map from geojson")
+    write!(f, "failed to load map {}: {}", self.name, self.reason)
   }
 }

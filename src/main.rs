@@ -10,6 +10,12 @@ pub mod world_map;
 use game::Game;
 
 fn main() {
-  let mut game = Game::new();
+  let mut game = match Game::new(None) {
+    Ok(g) => g,
+    Err(e) => {
+      println!("Failed to load the map!\n{}", e.reason);
+      return;
+    }
+  };
   game.start();
 }

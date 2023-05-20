@@ -5,27 +5,24 @@ on:
       - "v*"
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: x86_64-pc-windows-msvc
       - name: setup sfml
         run: |
-          wget https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip
-      - uses: actions-rs/cargo@v1
-        name: cargo fmt
-        with:
-          command: fmt
-          args: --all -- --check
-      - uses: actions-rs/cargo@v1
-        name: cargo build
-        with:
-          command: build
-          args: --release --target x86_64-pc-windows-msvc
+          wget -O sfml.zip https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip
+          unzip sfml.zip -d sfml
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+      - name: cargo build
+        run: cargo build --release
+        env:
+          SFML_INCLUDES_DIR: ./sfml/include
+          SFML_LIBS_DIR: ./sfml/lib
       - uses: softprops/action-gh-release@v1
         name: create release
         with:
-          files: mapwar-x64.exe
+          files: mapwar-linux-x64
