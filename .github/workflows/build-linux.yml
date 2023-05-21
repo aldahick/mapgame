@@ -12,7 +12,7 @@ jobs:
         with:
           toolchain: stable
       - name: install sfml
-        run: apt-get update && apt-get install -y libsfml-dev
+        run: sudo apt-get update && sudo apt-get install -y libsfml-dev
       - name: cargo fmt
         run: cargo fmt --all -- --check
       - name: cargo build
