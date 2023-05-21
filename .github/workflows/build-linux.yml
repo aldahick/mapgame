@@ -11,17 +11,17 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - name: setup sfml
-        run: |
-          wget -O sfml.zip https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip
-          unzip sfml.zip -d sfml
+      - name: install sfml
+        run: apt-get update && apt-get install -y libsfml-dev
       - name: cargo fmt
         run: cargo fmt --all -- --check
       - name: cargo build
-        run: cargo build --release
+        run: |
+          set -e
+          cargo build --release
+          mv ./target/release/mapwar ./mapwar-linux-x64
         env:
-          SFML_INCLUDES_DIR: ./sfml/include
-          SFML_LIBS_DIR: ./sfml/lib
+          CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
       - uses: softprops/action-gh-release@v1
         name: create release
         with:
