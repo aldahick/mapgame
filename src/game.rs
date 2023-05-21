@@ -29,25 +29,29 @@ impl Game {
 
   pub fn start(&mut self) {
     let window = &mut self.window;
-    let world_map = &mut self.world_map;
     let player = &mut self.player;
+    let world_map = &mut self.world_map;
     while window.is_open() {
       while let Some(event) = window.poll_event() {
+        let nations = &mut world_map.nations;
         match event {
           Event::Closed => window.close(),
           Event::Resized { width, height } => {
             let bounds = Rect::new(0.0, 0.0, width as f32, height as f32);
-            let nations = &mut world_map.nations;
             Game::on_resize(window, nations, bounds);
           }
           Event::MouseMoved { x, y } => {
             let position = Vector2f::new(x as f32, y as f32);
-            let nations = &mut world_map.nations;
-            let new_highlighted_id = WorldMap::get_highlighted_nation_at(nations, position);
-            world_map.highlighted_nation_id = new_highlighted_id;
+            let new_highlighted_id = WorldMap::set_highlighted_nation_at(nations, position);
+            world_map.highlighted_nation_id = new_highlighted_id.cloned();
           }
           Event::MouseButtonPressed { button, x: _, y: _ } => {
-            Game::on_mouse_button_press(button, world_map, player);
+            Game::on_mouse_button_press(
+              button,
+              nations,
+              &mut world_map.highlighted_nation_id,
+              player,
+            );
           }
           _ => {}
         }
@@ -65,12 +69,18 @@ impl Game {
     }
   }
 
-  fn on_mouse_button_press(button: Button, world_map: &mut WorldMap, player: &mut Box<Player>) {
+  fn on_mouse_button_press(
+    button: Button,
+    nations: &mut Nations,
+    highlighted_nation_id: &mut Option<String>,
+    player: &mut Box<Player>,
+  ) {
     if button == Button::Left && player.nation_id.is_none() {
-      let highlighted_id = &world_map.highlighted_nation_id;
-      if highlighted_id.is_some() {
-        player.nation_id = highlighted_id.clone();
-        println!("SELECTED NATION: {}", player.nation_id.as_ref().unwrap());
+      if highlighted_nation_id.is_some() {
+        let old_selected_id = player.nation_id.clone();
+        player.nation_id = highlighted_nation_id.clone();
+        let new_selected_id = highlighted_nation_id.clone().unwrap();
+        WorldMap::set_selected_nation(nations, old_selected_id, new_selected_id);
       }
     }
   }

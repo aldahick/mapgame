@@ -8,9 +8,9 @@ Install [Rust](https://www.rust-lang.org/tools/install), and execute `cargo run 
 
 ## Todo
 
-- [ ] Continuous:
-  - [ ] Integration
-  - [ ] Deployment (releases)
+- [x] Continuous:
+  - [x] Integration
+  - [x] Deployment (releases)
 - [ ] Nations
   - [x] Load from GeoJSON
   - [ ] Color

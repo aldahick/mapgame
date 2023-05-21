@@ -44,7 +44,8 @@ impl Nation {
       vector_polygons,
       vector_total_area: f32::abs(vector_total_area / 2.0),
       geo_polygons,
-      highlight: false,
+      highlighted: false,
+      selected: false,
     });
     Ok(nation)
   }

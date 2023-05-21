@@ -33,10 +33,6 @@ impl Nation {
     self.vector_total_area
   }
 
-  pub fn set_highlight(&mut self, value: bool) {
-    self.highlight = value;
-  }
-
   pub fn on_resize(&mut self, bounds: Bounds) {
     self.vector_polygons = WorldMap::to_vector_polygons(&self.geo_polygons, bounds);
     self.bounds = WorldMap::to_bounds(&self.vector_polygons);
@@ -53,7 +49,9 @@ impl Drawable for Nation {
     for vectors in &self.vector_polygons {
       let mut vertices = Vec::new();
       for vector in vectors {
-        let color = if self.highlight {
+        let color = if self.selected {
+          Color::BLUE
+        } else if self.highlighted {
           Color::GREEN
         } else {
           Color::BLACK
