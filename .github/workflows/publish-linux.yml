@@ -1,4 +1,4 @@
-name: Build clients
+name: Publish Linux release
 permissions:
   contents: write
 on:
@@ -13,18 +13,18 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - name: install sfml
+      - name: Install SFML
         run: sudo apt-get update && sudo apt-get install -y libsfml-dev
-      - name: cargo fmt
+      - name: Lint
         run: cargo fmt --all -- --check
-      - name: cargo build
+      - name: Build
         run: |
           set -e
           cargo build --release
           mv ./target/release/mapwar ./mapwar-linux-x64
         env:
           CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
-      - uses: softprops/action-gh-release@v1
-        name: create release
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
         with:
           files: mapwar-linux-x64
