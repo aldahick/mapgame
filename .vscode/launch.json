@@ -7,15 +7,15 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'mapwar'",
+      "name": "Debug executable 'mapgame'",
       "cargo": {
         "args": [
           "build",
-          "--bin=mapwar",
-          "--package=mapwar"
+          "--bin=mapgame",
+          "--package=mapgame"
         ],
         "filter": {
-          "name": "mapwar",
+          "name": "mapgame",
           "kind": "bin"
         }
       },
@@ -25,16 +25,16 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in executable 'mapwar'",
+      "name": "Debug unit tests in executable 'mapgame'",
       "cargo": {
         "args": [
           "test",
           "--no-run",
-          "--bin=mapwar",
-          "--package=mapwar"
+          "--bin=mapgame",
+          "--package=mapgame"
         ],
         "filter": {
-          "name": "mapwar",
+          "name": "mapgame",
           "kind": "bin"
         }
       },

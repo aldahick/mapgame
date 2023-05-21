@@ -24,7 +24,7 @@ impl Game {
       DEFAULT_MAP_PATH.to_string()
     };
     let world_map = WorldMap::new(map_path)?;
-    let mut window = RenderWindow::new((1920, 1080), "mapwar", Style::CLOSE, &Default::default());
+    let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default());
     window.set_framerate_limit(60);
     let player = Player::new();
     Ok(Game {

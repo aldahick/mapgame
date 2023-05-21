@@ -90,7 +90,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mapwar"
+name = "mapgame"
 version = "0.1.0"
 dependencies = [
  "geojson",

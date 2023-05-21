@@ -1,0 +1,60 @@
+name: Publish release
+permissions:
+  contents: write
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build_linux:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Install SFML
+        run: sudo apt-get update && sudo apt-get install -y libsfml-dev
+      - name: Lint
+        run: cargo fmt --all -- --check
+      - name: Build
+        run: cargo build --release
+        env:
+          CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mapgame-linux-x64
+          path: ./target/release/mapgame
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Install SFML
+        run: |
+          Invoke-WebRequest -OutFile sfml.zip https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip
+          Expand-Archive -DestinationPath .\sfml .\sfml.zip
+      # don't fmt here, since we already do in build_linux.
+      # would love to cross-compile and only use the linux runner
+      - name: Build
+        run: cargo build --release
+        env:
+          CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mapgame-windows-x64.exe
+          path: ./target/release/mapwar.exe
+  publish_release:
+    runs-on: ubuntu-latest
+    needs:
+      - build_linux
+      - build_windows
+    steps:
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            mapgame-windows-x64.exe
+            mapgame-linux-x64
