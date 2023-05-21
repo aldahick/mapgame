@@ -45,7 +45,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: mapgame-windows-x64.exe
-          path: ./target/release/mapwar.exe
+          path: ./target/release/mapgame.exe
   publish_release:
     runs-on: ubuntu-latest
     needs:

@@ -14,15 +14,8 @@ pub struct Game {
   player: Box<Player>,
 }
 
-const DEFAULT_MAP_PATH: &str = "./geo/countries.geojson";
-
 impl Game {
-  pub fn new(map_path: Option<String>) -> Result<Game, MapLoadError> {
-    let map_path = if map_path.is_some() {
-      map_path.unwrap()
-    } else {
-      DEFAULT_MAP_PATH.to_string()
-    };
+  pub fn new(map_path: String) -> Result<Game, MapLoadError> {
     let world_map = WorldMap::new(map_path)?;
     let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default());
     window.set_framerate_limit(60);
