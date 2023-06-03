@@ -16,6 +16,8 @@ Install [Rust](https://www.rust-lang.org/tools/install), and execute `cargo run 
   - [ ] Color
 - [ ] Provinces
   - [ ] Load from GeoJSON
+- [ ] View
+  - [ ] Zoom
 - [ ] Resources
 - [ ] Structures
   - [ ] Construction

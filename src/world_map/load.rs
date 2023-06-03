@@ -1,9 +1,10 @@
-use std::{collections::HashMap, fs, path::Path};
+use std::{collections::HashMap, error::Error, fs, path::Path};
 
 use geojson::FeatureCollection;
 use sfml::graphics::Rect;
 
 use crate::{
+  config::Config,
   errors::MapLoadError,
   nation::types::{Nation, Nations},
 };
@@ -11,8 +12,9 @@ use crate::{
 use super::types::{Bounds, WorldMap, MIN_NATION_AREA};
 
 impl WorldMap {
-  pub fn new<'a>(path_str: String) -> Result<WorldMap, MapLoadError> {
-    let path = Path::new(path_str.as_str());
+  pub fn new<'a>(config: &Config) -> Result<WorldMap, Box<dyn Error>> {
+    let path_str = config.nations_path.as_str();
+    let path = Path::new(path_str);
     let name = path
       .file_stem()
       .and_then(|n| Some(n.to_str().unwrap_or_default().to_string()))
@@ -20,20 +22,7 @@ impl WorldMap {
         name: String::default(),
         reason: format!("path '{}' has invalid file name", path_str),
       })?;
-    let geojson_str = fs::read_to_string(path).or_else(|e| {
-      Err(MapLoadError {
-        name: name.clone(),
-        reason: e.kind().to_string(),
-      })
-    })?;
-    let features = WorldMap::parse_features(geojson_str).or_else(|e| {
-      Err(MapLoadError {
-        name: name.clone(),
-        reason: e.to_string(),
-      })
-    })?;
-    let bounds = Rect::new(0.0, 0.0, 100.0, 100.0);
-    let nations = WorldMap::to_nations(features, bounds, name.clone())?;
+    let nations = WorldMap::load_nations(config, &name)?;
     Ok(WorldMap {
       name: name.clone(),
       nations,
@@ -46,10 +35,18 @@ impl WorldMap {
     geojson::FeatureCollection::try_from(geojson)
   }
 
+  fn load_nations(config: &Config, map_name: &String) -> Result<Nations, Box<dyn Error>> {
+    let geojson_str = fs::read_to_string(&config.nations_path)?;
+    let features = WorldMap::parse_features(geojson_str)?;
+    let bounds = Rect::new(0.0, 0.0, 100.0, 100.0);
+    let nations = WorldMap::to_nations(features, bounds, map_name)?;
+    Ok(nations)
+  }
+
   fn to_nations(
     features: FeatureCollection,
     bounds: Bounds,
-    map_name: String,
+    map_name: &String,
   ) -> Result<Nations, MapLoadError> {
     let mut nations = HashMap::new();
     for feature in features {

@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 futures = "0.3.28"
 geojson = "0.24.1"
+gpkg = "0.1.0"
 reqwest = "0.11.18"
 sfml = "0.20.0"
 tokio = { version = "1.28.1", features = ["full"] }

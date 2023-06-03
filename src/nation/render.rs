@@ -36,6 +36,27 @@ impl Nation {
   pub fn on_resize(&mut self, bounds: Bounds) {
     self.vector_polygons = WorldMap::to_vector_polygons(&self.geo_polygons, bounds);
     self.bounds = WorldMap::to_bounds(&self.vector_polygons);
+    self.update_cached_vertices();
+  }
+
+  pub fn update_cached_vertices(&mut self) {
+    let zero = Vector2f::new(0.0, 0.0);
+    let mut cached_vertices = Vec::new();
+    for vectors in &self.vector_polygons {
+      let mut vertices = Vec::new();
+      for vector in vectors {
+        let color = if self.is_selected() {
+          Color::BLUE
+        } else if self.is_highlighted() {
+          Color::GREEN
+        } else {
+          Color::BLACK
+        };
+        vertices.push(Vertex::new(*vector, color, zero));
+      }
+      cached_vertices.push(vertices);
+    }
+    self.cached_vertices = cached_vertices;
   }
 }
 
@@ -45,20 +66,8 @@ impl Drawable for Nation {
     target: &mut dyn sfml::graphics::RenderTarget,
     states: &sfml::graphics::RenderStates<'texture, 'shader, 'shader_texture>,
   ) {
-    let zero = Vector2f::new(0.0, 0.0);
-    for vectors in &self.vector_polygons {
-      let mut vertices = Vec::new();
-      for vector in vectors {
-        let color = if self.selected {
-          Color::BLUE
-        } else if self.highlighted {
-          Color::GREEN
-        } else {
-          Color::BLACK
-        };
-        vertices.push(Vertex::new(*vector, color, zero));
-      }
-      target.draw_primitives(vertices.as_slice(), PrimitiveType::LINE_STRIP, states);
+    for vertices in &self.cached_vertices {
+      target.draw_primitives(vertices, PrimitiveType::LINE_STRIP, states);
     }
   }
 }
