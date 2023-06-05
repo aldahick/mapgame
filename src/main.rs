@@ -3,9 +3,11 @@
 pub mod config;
 pub mod errors;
 pub mod game;
+pub mod geo_drawable;
 pub mod math;
 pub mod nation;
 pub mod player;
+pub mod province;
 pub mod world_map;
 
 use std::error::Error;

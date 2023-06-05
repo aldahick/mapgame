@@ -6,7 +6,7 @@ use sfml::{
   window::{mouse::Button, Event, Style},
 };
 
-use crate::{config::Config, player::types::Player, world_map::types::WorldMap};
+use crate::{config::Config, player::Player, world_map::WorldMap};
 
 pub struct Game {
   window: RenderWindow,
@@ -60,9 +60,7 @@ impl Game {
 
   fn on_resize(&mut self, bounds: Rect<f32>) {
     self.window.set_view(&View::from_rect(bounds));
-    for (_id, nation) in self.world_map.nations.iter_mut() {
-      nation.on_resize(bounds);
-    }
+    self.world_map.on_resize(&bounds);
   }
 
   fn on_mouse_move(&mut self, position: Vector2f) {
@@ -80,7 +78,7 @@ impl Game {
       let highlighted_nation = self.world_map.get_highlighted_nation();
       if highlighted_nation.is_some() {
         let old_selected_id = self.player.nation_id.clone();
-        self.player.nation_id = highlighted_nation.and_then(|n| Some(n.id.clone()));
+        self.player.nation_id = highlighted_nation.and_then(|n| Some(n.id().clone()));
         let new_selected_id = self.player.nation_id.clone().unwrap();
         self
           .world_map
