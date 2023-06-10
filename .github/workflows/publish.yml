@@ -32,10 +32,10 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - name: Install SFML
-        run: |
-          Invoke-WebRequest -OutFile sfml.zip https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip
-          Expand-Archive -DestinationPath . .\sfml.zip
+      - name: Download SFML
+        run: Invoke-WebRequest -OutFile sfml.zip https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip
+      - name: Extract SFML
+        run: Expand-Archive -DestinationPath . .\sfml.zip
       # don't fmt here, since we already do in build_linux.
       # would love to cross-compile and only use the linux runner
       - name: Build
