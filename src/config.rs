@@ -11,8 +11,7 @@ pub struct Config {
 
 const NATIONS_PATH_KEY: &str = "NATIONS_PATH";
 const DEFAULT_NATIONS_PATH: &str = "./mapgame/countries.geojson";
-const DEFAULT_NATIONS_URL: &str =
-  "https://s.ahicks.dev/complete-reflecting-zonetailedpigeon/direct";
+const DEFAULT_NATIONS_URL: &str = "https://s.ahicks.dev/nimble-mistyrose-locust/direct";
 
 impl Config {
   pub async fn new() -> Result<Config, Box<dyn Error>> {
@@ -24,7 +23,7 @@ impl Config {
   async fn download_file(url: &str, path_str: &str) -> Result<(), Box<dyn Error>> {
     let resp = reqwest::get(DEFAULT_NATIONS_URL).await?.bytes().await?;
     let path = Path::new(path_str);
-    if path.exists() {
+    if path.exists() && (resp.len() as u64) == path.metadata()?.len() {
       return Ok(());
     }
     println!("Downloading {} to {}", url, path_str);

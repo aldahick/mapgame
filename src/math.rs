@@ -32,5 +32,5 @@ pub fn polygon_area(polygon: &Vec<Vector2f>) -> f32 {
     let end = polygon[if i == len - 1 { 0 } else { i + 1 }];
     area += start.x * end.y - start.y * end.x;
   }
-  area / 2.0
+  (area / 2.0).abs()
 }

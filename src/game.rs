@@ -64,6 +64,9 @@ impl Game {
   }
 
   fn on_mouse_move(&mut self, position: Vector2f) {
+    if !self.window.has_focus() {
+      return;
+    }
     if match self.world_map.get_highlighted_nation() {
       Some(n) => n.includes(position),
       None => false,
