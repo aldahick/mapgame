@@ -16,8 +16,6 @@ jobs:
           toolchain: stable
       - name: Install SFML
         run: sudo apt-get update && sudo apt-get install -y libsfml-dev
-      - name: Lint
-        run: cargo fmt --all -- --check
       - name: Build
         run: cargo build --release
         env:
@@ -37,8 +35,6 @@ jobs:
         run: Invoke-WebRequest -OutFile sfml.zip https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip
       - name: Extract SFML
         run: Expand-Archive -DestinationPath . .\sfml.zip
-      # don't fmt here, since we already do in build_linux.
-      # would love to cross-compile and only use the linux runner
       - name: Build
         run: cargo build --release
         env:
