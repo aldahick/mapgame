@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use geojson::Feature;
 use sfml::{
-  graphics::{Color, Drawable, PrimitiveType, Vertex},
+  graphics::{Color, Drawable, PrimitiveType},
   system::Vector2f,
 };
 
@@ -16,7 +16,6 @@ pub struct Nation {
   pub highlighted: bool,
   pub selected: bool,
   pub geo_drawable: Box<GeoDrawable>,
-  pub cached_vertices: Vec<Vec<Vertex>>,
 }
 pub type Nations = HashMap<String, Box<Nation>>;
 
@@ -29,7 +28,6 @@ impl Nation {
     let geo_drawable = GeoDrawable::new(feature, bounds, map_name, "ADMIN", Some("ISO_A3"))?;
     let mut nation = Box::new(Nation {
       geo_drawable,
-      cached_vertices: Vec::new(),
       highlighted: false,
       selected: false,
     });
@@ -73,23 +71,14 @@ impl Nation {
   }
 
   pub fn update_cached_vertices(&mut self) {
-    let zero = Vector2f::new(0.0, 0.0);
-    let mut cached_vertices = Vec::new();
-    for vectors in &self.geo_drawable.vector_polygons {
-      let mut vertices = Vec::new();
-      for vector in vectors {
-        let color = if self.is_selected() {
-          Color::BLUE
-        } else if self.is_highlighted() {
-          Color::GREEN
-        } else {
-          Color::BLACK
-        };
-        vertices.push(Vertex::new(*vector, color, zero));
-      }
-      cached_vertices.push(vertices);
-    }
-    self.cached_vertices = cached_vertices;
+    let color = if self.is_selected() {
+      Color::BLUE
+    } else if self.is_highlighted() {
+      Color::GREEN
+    } else {
+      Color::BLACK
+    };
+    self.geo_drawable.update_cached_vertices(color);
   }
 }
 
@@ -99,7 +88,7 @@ impl Drawable for Nation {
     target: &mut dyn sfml::graphics::RenderTarget,
     states: &sfml::graphics::RenderStates<'texture, 'shader, 'shader_texture>,
   ) {
-    for vertices in &self.cached_vertices {
+    for vertices in &self.geo_drawable.cached_vertices {
       target.draw_primitives(vertices, PrimitiveType::LINE_STRIP, states);
     }
   }

@@ -1,5 +1,8 @@
 use geojson::{feature::Id, Feature, Value};
-use sfml::{graphics::Rect, system::Vector2f};
+use sfml::{
+  graphics::{Color, Rect, Vertex},
+  system::Vector2f,
+};
 
 use crate::{
   errors::MapLoadError,
@@ -21,6 +24,7 @@ pub struct GeoDrawable {
   pub vector_polygons: VectorPolygons,
   pub vector_total_area: f32,
   pub bounds: Vec<Bounds>,
+  pub cached_vertices: Vec<Vec<Vertex>>,
 }
 
 pub trait GeoDrawableUpdater {
@@ -71,6 +75,7 @@ impl GeoDrawable {
       vector_polygons,
       vector_total_area,
       bounds,
+      cached_vertices: Vec::new(),
     }))
   }
 
@@ -120,6 +125,7 @@ impl GeoDrawable {
     let mut vector_groups = Vec::new();
     for polygon in polygons {
       // see: https://stevage.github.io/geojson-spec/#section-3.1.6
+      // the last point is a wraparound (identical to first) and can be ignored
       for linear_ring in polygon {
         let mut vector_group = Vec::new();
         if let Some((_last, points)) = linear_ring.as_slice().split_last() {
@@ -165,5 +171,25 @@ impl GeoDrawable {
       bounds.push(Rect::new(min_x, min_y, max_x - min_x, max_y - min_y));
     }
     bounds
+  }
+
+  pub fn update_cached_vertices(&mut self, color: Color) {
+    let zero = Vector2f::new(0.0, 0.0);
+    let mut cached_vertices = Vec::new();
+    for vectors in &self.vector_polygons {
+      let mut vertices = Vec::new();
+      for vector in vectors {
+        // let color = if self.is_selected() {
+        //   Color::BLUE
+        // } else if self.is_highlighted() {
+        //   Color::GREEN
+        // } else {
+        //   Color::BLACK
+        // };
+        vertices.push(Vertex::new(*vector, color, zero));
+      }
+      cached_vertices.push(vertices);
+    }
+    self.cached_vertices = cached_vertices;
   }
 }
