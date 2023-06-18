@@ -15,8 +15,8 @@ pub struct Game {
 }
 
 impl Game {
-  pub fn new(config: &Config) -> Result<Game, Box<dyn Error>> {
-    let world_map = WorldMap::new(config)?;
+  pub async fn new(config: &Config) -> Result<Game, Box<dyn Error>> {
+    let world_map = WorldMap::new(config).await?;
     let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default());
     window.set_framerate_limit(60);
     let player = Player::new();

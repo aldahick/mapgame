@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, error::Error};
 
 use geojson::Feature;
 use sfml::{
@@ -7,8 +7,9 @@ use sfml::{
 };
 
 use crate::{
-  errors::MapLoadError,
+  config::Config,
   geo_drawable::{Bounds, GeoDrawable},
+  province::{Province, Provinces},
 };
 
 #[derive(Debug)]
@@ -16,20 +17,23 @@ pub struct Nation {
   pub highlighted: bool,
   pub selected: bool,
   pub geo_drawable: Box<GeoDrawable>,
+  pub provinces: Option<Provinces>,
 }
 pub type Nations = HashMap<String, Box<Nation>>;
 
 impl Nation {
-  pub fn new(
+  pub async fn new(
     feature: Feature,
     bounds: &Bounds,
-    map_name: String,
-  ) -> Result<Box<Nation>, MapLoadError> {
-    let geo_drawable = GeoDrawable::new(feature, bounds, map_name, "ADMIN", Some("ISO_A3"))?;
+    config: &Config,
+  ) -> Result<Box<Nation>, Box<dyn Error>> {
+    let geo_drawable = GeoDrawable::new(feature, bounds, "ADMIN", Some("ISO_A3"))?;
+    let provinces = Province::load(config, geo_drawable.id.clone()).await?;
     let mut nation = Box::new(Nation {
       geo_drawable,
       highlighted: false,
       selected: false,
+      provinces,
     });
     nation.update_cached_vertices();
     Ok(nation)

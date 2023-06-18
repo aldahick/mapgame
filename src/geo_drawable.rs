@@ -35,7 +35,6 @@ impl GeoDrawable {
   pub fn new(
     feature: Feature,
     world_bounds: &Bounds,
-    map_name: String,
     name_property: &str,
     id_property: Option<&str>,
   ) -> Result<Box<GeoDrawable>, MapLoadError> {
@@ -48,15 +47,13 @@ impl GeoDrawable {
           Id::Number(id) => Some(id.to_string()),
         })
         .ok_or_else(|| MapLoadError {
-          name: map_name.clone(),
           reason: format!("failed to load province: no ID found"),
         })
     } else {
-      GeoDrawable::get_feature_property(&feature, &map_name, id_property.unwrap())
+      GeoDrawable::get_feature_property(&feature, id_property.unwrap())
     }?;
-    let name = GeoDrawable::get_feature_property(&feature, &map_name, name_property)?;
+    let name = GeoDrawable::get_feature_property(&feature, name_property)?;
     let geometry = feature.geometry.as_ref().ok_or_else(|| MapLoadError {
-      name: map_name,
       reason: format!("failed to load province geometry for '{}'", name),
     })?;
     let mut geo_polygons: GeoPolygons = Vec::new();
@@ -79,20 +76,14 @@ impl GeoDrawable {
     }))
   }
 
-  pub fn get_feature_property(
-    feature: &Feature,
-    map_name: &String,
-    key: &str,
-  ) -> Result<String, MapLoadError> {
-    Ok(
-      feature
-        .property(key)
-        .ok_or_else(|| MapLoadError {
-          name: map_name.clone(),
-          reason: format!("failed to get property from GeoJSON feature: {}", key),
-        })?
-        .to_string(),
-    )
+  pub fn get_feature_property(feature: &Feature, key: &str) -> Result<String, MapLoadError> {
+    let value = feature
+      .property(key)
+      .ok_or_else(|| MapLoadError {
+        reason: format!("failed to get property from GeoJSON feature: {}", key),
+      })?
+      .to_string();
+    Ok(value)
   }
 
   pub fn on_resize(&mut self, bounds: &Bounds) {

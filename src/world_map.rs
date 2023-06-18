@@ -2,8 +2,9 @@ use sfml::{
   graphics::{RenderTarget, RenderWindow},
   system::Vector2f,
 };
+use tokio::fs::read_to_string;
 
-use std::{collections::HashMap, error::Error, fs, ops::Deref, path::Path};
+use std::{collections::HashMap, error::Error, ops::Deref, path::Path};
 
 use geojson::FeatureCollection;
 use sfml::graphics::Rect;
@@ -25,19 +26,18 @@ pub struct WorldMap {
 }
 
 impl WorldMap {
-  pub fn new<'a>(config: &Config) -> Result<WorldMap, Box<dyn Error>> {
+  pub async fn new<'a>(config: &Config) -> Result<WorldMap, Box<dyn Error>> {
     let path_str = config.nations_path.as_str();
     let path = Path::new(path_str);
     let name = path
       .file_stem()
       .and_then(|n| Some(n.to_str().unwrap_or_default().to_string()))
       .ok_or_else(|| MapLoadError {
-        name: String::default(),
         reason: format!("path '{}' has invalid file name", path_str),
       })?;
-    let nations = WorldMap::load_nations(config, &name)?;
+    let nations = WorldMap::load_nations(config).await?;
     Ok(WorldMap {
-      name: name.clone(),
+      name,
       nations,
       highlighted_nation_id: None,
     })
@@ -67,22 +67,13 @@ impl WorldMap {
     geojson::FeatureCollection::try_from(geojson)
   }
 
-  fn load_nations(config: &Config, map_name: &String) -> Result<Nations, Box<dyn Error>> {
-    let geojson_str = fs::read_to_string(&config.nations_path)?;
+  async fn load_nations(config: &Config) -> Result<Nations, Box<dyn Error>> {
+    let geojson_str = read_to_string(&config.nations_path).await?;
     let features = WorldMap::parse_features(geojson_str)?;
     let bounds = Rect::new(0.0, 0.0, 100.0, 100.0);
-    let nations = WorldMap::to_nations(features, &bounds, map_name)?;
-    Ok(nations)
-  }
-
-  fn to_nations(
-    features: FeatureCollection,
-    bounds: &Bounds,
-    map_name: &String,
-  ) -> Result<Nations, MapLoadError> {
     let mut nations = HashMap::new();
     for feature in features {
-      let nation = Nation::new(feature, bounds, map_name.clone())?;
+      let nation = Nation::new(feature, &bounds, config).await?;
       let nation_id = nation.id().clone();
       if nation.area() > MIN_NATION_AREA {
         nations.insert(nation_id, nation);
