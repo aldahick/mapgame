@@ -14,6 +14,7 @@ use crate::{
   errors::MapLoadError,
   geo_drawable::Bounds,
   nation::{Nation, Nations},
+  province::Province,
 };
 
 // simply too many nations. ideally this will be removed
@@ -72,10 +73,11 @@ impl WorldMap {
   async fn load_nations(config: &Config) -> Result<Nations, Box<dyn Error>> {
     let geojson_str = read_to_string(&config.nations_path).await?;
     let features = WorldMap::parse_features(geojson_str)?;
+    let province_mappings = Province::load_mappings(config).await?;
     let bounds = Rect::new(0.0, 0.0, 100.0, 100.0);
     let mut nations = HashMap::new();
     for feature in features {
-      let nation = Nation::new(feature, &bounds, config).await?;
+      let nation = Nation::new(feature, &bounds, config, &province_mappings).await?;
       let nation_id = nation.id().clone();
       if nation.area() > MIN_NATION_AREA {
         nations.insert(nation_id, nation);

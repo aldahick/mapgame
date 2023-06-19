@@ -9,7 +9,7 @@ use sfml::{
 use crate::{
   config::Config,
   geo_drawable::{Bounds, GeoDrawable},
-  province::{Province, Provinces},
+  province::{Province, ProvinceMappings, Provinces},
 };
 
 #[derive(Debug)]
@@ -26,9 +26,12 @@ impl Nation {
     feature: Feature,
     bounds: &Bounds,
     config: &Config,
+    province_mappings: &ProvinceMappings,
   ) -> Result<Box<Nation>, Box<dyn Error>> {
     let geo_drawable = GeoDrawable::new(feature, bounds, "ADMIN", Some("ISO_A3"))?;
-    let provinces = Province::load(config, geo_drawable.id.clone()).await?;
+    let nation_id = geo_drawable.id.clone();
+    let province_mapping = province_mappings.get(&nation_id);
+    let provinces = Province::load_nation(config, nation_id, province_mapping).await?;
     let mut nation = Box::new(Nation {
       geo_drawable,
       highlighted: false,

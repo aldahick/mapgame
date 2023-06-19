@@ -47,5 +47,7 @@ Play strategy, on a map.
 
 - World map (nations): TODO
 - Province maps:
+  - [AFG](https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-afghanistan)
   - [CHN](https://github.com/junwang23/geoCN/blob/master/geojson/china_provinces.json)
+  - [RUS](https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-russian-federation)
   - [USA](https://github.com/PublicaMundi/MappingAPI/blob/master/data/geojson/us-states.json)
