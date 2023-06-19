@@ -1,6 +1,6 @@
-use geojson::{feature::Id, Feature, Value};
+use geojson::{feature::Id, Feature, JsonValue, Value};
 use sfml::{
-  graphics::{Color, Rect, Vertex},
+  graphics::{Color, PrimitiveType, Rect, RenderStates, Vertex},
   system::Vector2f,
 };
 
@@ -27,10 +27,6 @@ pub struct GeoDrawable {
   pub cached_vertices: Vec<Vec<Vertex>>,
 }
 
-pub trait GeoDrawableUpdater {
-  fn update_cached_vertices(&mut self);
-}
-
 impl GeoDrawable {
   pub fn new(
     feature: Feature,
@@ -38,21 +34,22 @@ impl GeoDrawable {
     name_property: &str,
     id_property: Option<&str>,
   ) -> Result<Box<GeoDrawable>, MapLoadError> {
-    let id = if id_property.is_none() {
-      feature
-        .id
-        .clone()
-        .and_then(|id| match id {
-          Id::String(id) => Some(id),
-          Id::Number(id) => Some(id.to_string()),
-        })
-        .ok_or_else(|| MapLoadError {
-          reason: format!("failed to load province: no ID found"),
-        })
+    let id = if id_property.is_some() || feature.id.is_none() {
+      GeoDrawable::get_feature_property(&feature, id_property.unwrap_or("id"))
     } else {
-      GeoDrawable::get_feature_property(&feature, id_property.unwrap())
-    }?;
-    let name = GeoDrawable::get_feature_property(&feature, name_property)?;
+      match feature.id.clone() {
+        Some(Id::String(id)) => Some(id.to_string()),
+        Some(Id::Number(id)) => Some(id.to_string()),
+        None => None,
+      }
+    }
+    .ok_or_else(|| MapLoadError {
+      reason: format!("GeoDrawable ID not found at property {:?}", id_property).to_string(),
+    })?;
+    let name =
+      GeoDrawable::get_feature_property(&feature, name_property).ok_or_else(|| MapLoadError {
+        reason: format!("GeoDrawable name not found at property {}", name_property),
+      })?;
     let geometry = feature.geometry.as_ref().ok_or_else(|| MapLoadError {
       reason: format!("failed to load province geometry for '{}'", name),
     })?;
@@ -76,14 +73,19 @@ impl GeoDrawable {
     }))
   }
 
-  pub fn get_feature_property(feature: &Feature, key: &str) -> Result<String, MapLoadError> {
-    let value = feature
-      .property(key)
-      .ok_or_else(|| MapLoadError {
-        reason: format!("failed to get property from GeoJSON feature: {}", key),
-      })?
-      .to_string();
-    Ok(value)
+  pub fn get_feature_property(feature: &Feature, key: &str) -> Option<String> {
+    let value = feature.property(key);
+    if value.is_none() {
+      return None;
+    }
+    match value.unwrap() {
+      JsonValue::String(str) => Some(str.clone()),
+      JsonValue::Array(_a) => None,
+      JsonValue::Bool(_b) => None,
+      JsonValue::Null => None,
+      JsonValue::Number(n) => Some(n.to_string()),
+      JsonValue::Object(_o) => None,
+    }
   }
 
   pub fn on_resize(&mut self, bounds: &Bounds) {
@@ -170,17 +172,20 @@ impl GeoDrawable {
     for vectors in &self.vector_polygons {
       let mut vertices = Vec::new();
       for vector in vectors {
-        // let color = if self.is_selected() {
-        //   Color::BLUE
-        // } else if self.is_highlighted() {
-        //   Color::GREEN
-        // } else {
-        //   Color::BLACK
-        // };
         vertices.push(Vertex::new(*vector, color, zero));
       }
       cached_vertices.push(vertices);
     }
     self.cached_vertices = cached_vertices;
+  }
+
+  pub fn draw(
+    &self,
+    target: &mut dyn sfml::graphics::RenderTarget,
+    states: &RenderStates<'_, '_, '_>,
+  ) {
+    for vertices in &self.cached_vertices {
+      target.draw_primitives(vertices, PrimitiveType::LINE_STRIP, states);
+    }
   }
 }

@@ -38,3 +38,10 @@ Install [Rust](https://www.rust-lang.org/tools/install), and execute `cargo run 
 - [ ] Planes
 - [ ] Networking
 - [ ] Multiplayer
+
+## Credits
+
+- World map (nations): TODO
+- Province maps:
+  - [CHN](https://github.com/junwang23/geoCN/blob/master/geojson/china_provinces.json)
+  - [USA](https://github.com/PublicaMundi/MappingAPI/blob/master/data/geojson/us-states.json)

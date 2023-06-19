@@ -31,7 +31,7 @@ impl WorldMap {
     let path = Path::new(path_str);
     let name = path
       .file_stem()
-      .and_then(|n| Some(n.to_str().unwrap_or_default().to_string()))
+      .and_then(|n| Some(n.to_str()?.to_string()))
       .ok_or_else(|| MapLoadError {
         reason: format!("path '{}' has invalid file name", path_str),
       })?;
@@ -45,12 +45,14 @@ impl WorldMap {
 
   pub fn render(&self, window: &mut RenderWindow) {
     let highlight_id = self.highlighted_nation_id.clone().unwrap_or_default();
+    let mut highlight_nation: Option<&Box<Nation>> = None;
     for (id, nation) in &self.nations {
-      if id.as_str() != highlight_id {
+      if id.as_str() == highlight_id {
+        highlight_nation = Some(nation);
+      } else {
         window.draw(nation.deref());
       }
     }
-    let highlight_nation = self.nations.get(highlight_id.as_str());
     if highlight_nation.is_some() {
       window.draw(highlight_nation.unwrap().deref());
     }
@@ -77,12 +79,6 @@ impl WorldMap {
       let nation_id = nation.id().clone();
       if nation.area() > MIN_NATION_AREA {
         nations.insert(nation_id, nation);
-      } else {
-        println!(
-          "nation {} is NOT big enough at {}",
-          nation_id,
-          nation.area()
-        );
       }
     }
     Ok(nations)
@@ -103,10 +99,8 @@ impl WorldMap {
   }
 
   pub fn get_highlighted_nation(&self) -> Option<&Box<Nation>> {
-    self
-      .highlighted_nation_id
-      .clone()
-      .and_then(|id| self.nations.get(id.as_str()))
+    let highlighted_id = self.highlighted_nation_id.clone()?;
+    self.nations.get(highlighted_id.as_str())
   }
 
   /* Selects the highlighted nation and unselects the old one (if any) */

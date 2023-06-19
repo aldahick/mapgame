@@ -81,11 +81,11 @@ impl Game {
       let highlighted_nation = self.world_map.get_highlighted_nation();
       if highlighted_nation.is_some() {
         let old_selected_id = self.player.nation_id.clone();
-        self.player.nation_id = highlighted_nation.and_then(|n| Some(n.id().clone()));
-        let new_selected_id = self.player.nation_id.clone().unwrap();
+        let new_selected_id = highlighted_nation.unwrap().id();
+        self.player.nation_id = Some(new_selected_id.clone());
         self
           .world_map
-          .set_selected_nation(old_selected_id, new_selected_id);
+          .set_selected_nation(old_selected_id, new_selected_id.clone());
       }
     }
   }

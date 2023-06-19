@@ -2,7 +2,7 @@ use std::{collections::HashMap, error::Error};
 
 use geojson::Feature;
 use sfml::{
-  graphics::{Color, Drawable, PrimitiveType},
+  graphics::{Color, Drawable},
   system::Vector2f,
 };
 
@@ -72,6 +72,12 @@ impl Nation {
   pub fn on_resize(&mut self, bounds: &Bounds) {
     self.geo_drawable.on_resize(bounds);
     self.update_cached_vertices();
+    if self.provinces.is_some() {
+      for (_id, province) in self.provinces.as_mut().unwrap() {
+        province.geo_drawable.on_resize(bounds);
+        province.update_cached_vertices();
+      }
+    }
   }
 
   pub fn update_cached_vertices(&mut self) {
@@ -92,8 +98,11 @@ impl Drawable for Nation {
     target: &mut dyn sfml::graphics::RenderTarget,
     states: &sfml::graphics::RenderStates<'texture, 'shader, 'shader_texture>,
   ) {
-    for vertices in &self.geo_drawable.cached_vertices {
-      target.draw_primitives(vertices, PrimitiveType::LINE_STRIP, states);
+    if self.provinces.is_some() {
+      for (_id, province) in self.provinces.as_ref().unwrap() {
+        province.geo_drawable.draw(target, states);
+      }
     }
+    self.geo_drawable.draw(target, states);
   }
 }
