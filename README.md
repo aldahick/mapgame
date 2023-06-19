@@ -4,18 +4,22 @@ Play strategy, on a map.
 
 ## Playing
 
-Install [Rust](https://www.rust-lang.org/tools/install), and execute `cargo run .`
+1. Install [Rust](https://www.rust-lang.org/tools/install)
+2. Install [SFML](https://docs.rs/sfml/latest/sfml/). On Ubuntu, do `apt install libsfml-dev build-essential pkg-config libssl-dev`
+3. Execute `cargo run .`
 
 ## Todo
 
 - [x] Continuous:
   - [x] Integration
-  - [x] Deployment (releases)
+  - [ ] Deployment (releases)
 - [ ] Nations
+  - [x] Download GeoJSON
   - [x] Load from GeoJSON
   - [ ] Color
 - [ ] Provinces
-  - [ ] Load from GeoJSON
+  - [ ] Download GeoJSON
+  - [x] Load from GeoJSON
 - [ ] View
   - [ ] Zoom
 - [ ] Resources
