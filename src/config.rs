@@ -1,34 +1,31 @@
-use std::{env, error::Error};
+use std::{collections::HashMap, error::Error, fs::read_dir, path::Path};
 
-use crate::util::download_file;
-
-pub struct Config {
-  pub nations_path: String,
-  pub provinces_dir: String,
-  pub province_mappings_path: String,
+pub struct MapConfig {
+  pub name: String,
+  pub nations_path: Box<Path>,
+  pub provinces_dir: Box<Path>,
+  pub province_mappings_path: Box<Path>,
 }
+pub type MapConfigs = HashMap<String, Box<MapConfig>>;
 
-const NATIONS_PATH_KEY: &str = "NATIONS_PATH";
-const DEFAULT_NATIONS_PATH: &str = "./mapgame/countries.geojson";
-const DEFAULT_NATIONS_URL: &str = "https://s.ahicks.dev/nimble-mistyrose-locust/direct";
+const MAPS_DIR: &str = "./maps";
+const NATIONS_FILE: &str = "nations.geojson";
+const PROVINCE_MAPPINGS_FILE: &str = "provinces.json";
+const PROVINCES_DIR: &str = "provinces";
 
-const PROVINCES_DIR_KEY: &str = "PROVINCES_DIR";
-const DEFAULT_PROVINCES_DIR: &str = "./mapgame/provinces";
-
-const PROVINCE_MAPPINGS_PATH_KEY: &str = "PROVINCE_MAPPINGS_PATH";
-const DEFAULT_PROVINCE_MAPPINGS_PATH: &str = "./mapgame/provinces.json";
-
-impl Config {
-  pub async fn new() -> Result<Config, Box<dyn Error>> {
-    let nations_path = env::var(NATIONS_PATH_KEY).unwrap_or(DEFAULT_NATIONS_PATH.to_string());
-    let provinces_dir = env::var(PROVINCES_DIR_KEY).unwrap_or(DEFAULT_PROVINCES_DIR.to_string());
-    let province_mappings_path =
-      env::var(PROVINCE_MAPPINGS_PATH_KEY).unwrap_or(DEFAULT_PROVINCE_MAPPINGS_PATH.to_string());
-    download_file(DEFAULT_NATIONS_URL, &nations_path).await?;
-    Ok(Config {
-      nations_path,
-      provinces_dir,
-      province_mappings_path,
-    })
+pub fn get_available_maps() -> Result<MapConfigs, Box<dyn Error>> {
+  let mut maps = HashMap::new();
+  let entries = read_dir(MAPS_DIR)?;
+  for entry in entries {
+    let name = entry?.file_name().into_string().unwrap();
+    let base_path = Path::new(MAPS_DIR).join(name.clone());
+    let map = Box::new(MapConfig {
+      name: name.clone(),
+      nations_path: base_path.clone().join(NATIONS_FILE).into(),
+      province_mappings_path: base_path.clone().join(PROVINCE_MAPPINGS_FILE).into(),
+      provinces_dir: base_path.clone().join(PROVINCES_DIR).into(),
+    });
+    maps.insert(name, map);
   }
+  Ok(maps)
 }

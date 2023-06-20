@@ -4,13 +4,13 @@ use sfml::{
 };
 use tokio::fs::read_to_string;
 
-use std::{collections::HashMap, error::Error, ops::Deref, path::Path};
+use std::{collections::HashMap, error::Error, ops::Deref};
 
 use geojson::FeatureCollection;
 use sfml::graphics::Rect;
 
 use crate::{
-  config::Config,
+  config::MapConfig,
   errors::MapLoadError,
   geo_drawable::Bounds,
   nation::{Nation, Nations},
@@ -27,18 +27,10 @@ pub struct WorldMap {
 }
 
 impl WorldMap {
-  pub async fn new<'a>(config: &Config) -> Result<WorldMap, Box<dyn Error>> {
-    let path_str = config.nations_path.as_str();
-    let path = Path::new(path_str);
-    let name = path
-      .file_stem()
-      .and_then(|n| Some(n.to_str()?.to_string()))
-      .ok_or_else(|| MapLoadError {
-        reason: format!("path '{}' has invalid file name", path_str),
-      })?;
+  pub async fn new<'a>(config: &MapConfig) -> Result<WorldMap, Box<dyn Error>> {
     let nations = WorldMap::load_nations(config).await?;
     Ok(WorldMap {
-      name,
+      name: config.name.clone(),
       nations,
       highlighted_nation_id: None,
     })
@@ -70,7 +62,15 @@ impl WorldMap {
     geojson::FeatureCollection::try_from(geojson)
   }
 
-  async fn load_nations(config: &Config) -> Result<Nations, Box<dyn Error>> {
+  async fn load_nations(config: &MapConfig) -> Result<Nations, Box<dyn Error>> {
+    if !config.nations_path.exists() {
+      return Err(Box::new(MapLoadError {
+        reason: format!(
+          "No nations JSON found at {:?}",
+          config.nations_path.to_str()
+        ),
+      }));
+    }
     let geojson_str = read_to_string(&config.nations_path).await?;
     let features = WorldMap::parse_features(geojson_str)?;
     let province_mappings = Province::load_mappings(config).await?;

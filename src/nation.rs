@@ -7,7 +7,7 @@ use sfml::{
 };
 
 use crate::{
-  config::Config,
+  config::MapConfig,
   geo_drawable::{Bounds, GeoDrawable},
   province::{Province, ProvinceMappings, Provinces},
 };
@@ -25,7 +25,7 @@ impl Nation {
   pub async fn new(
     feature: Feature,
     bounds: &Bounds,
-    config: &Config,
+    config: &MapConfig,
     province_mappings: &ProvinceMappings,
   ) -> Result<Box<Nation>, Box<dyn Error>> {
     let geo_drawable = GeoDrawable::new(feature, bounds, "ADMIN", Some("ISO_A3"))?;

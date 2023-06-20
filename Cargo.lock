@@ -481,6 +481,7 @@ version = "0.1.0"
 dependencies = [
  "futures",
  "geojson",
+ "link-cplusplus",
  "reqwest",
  "serde",
  "serde_json",

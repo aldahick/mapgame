@@ -1,0 +1,13 @@
+{
+  "AFG": {
+    "id": "shapeID",
+    "name": "shapeName"
+  },
+  "CHN": {
+    "id": "id"
+  },
+  "RUS": {
+    "id": "shapeID",
+    "name": "shapeName"
+  }
+}

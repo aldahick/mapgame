@@ -6,7 +6,7 @@ use sfml::{
   window::{mouse::Button, Event, Style},
 };
 
-use crate::{config::Config, player::Player, world_map::WorldMap};
+use crate::{config::MapConfig, player::Player, world_map::WorldMap};
 
 pub struct Game {
   window: RenderWindow,
@@ -15,7 +15,7 @@ pub struct Game {
 }
 
 impl Game {
-  pub async fn new(config: &Config) -> Result<Game, Box<dyn Error>> {
+  pub async fn new(config: &MapConfig) -> Result<Game, Box<dyn Error>> {
     let world_map = WorldMap::new(config).await?;
     let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default());
     window.set_framerate_limit(60);

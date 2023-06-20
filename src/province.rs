@@ -1,4 +1,4 @@
-use std::{collections::HashMap, error::Error, path::Path};
+use std::{collections::HashMap, error::Error};
 
 use geojson::{Feature, FeatureCollection, GeoJson};
 use serde::Deserialize;
@@ -6,7 +6,7 @@ use sfml::graphics::{Color, Rect};
 use tokio::fs::read_to_string;
 
 use crate::{
-  config::Config,
+  config::MapConfig,
   geo_drawable::{Bounds, GeoDrawable},
 };
 
@@ -27,18 +27,21 @@ const DEFAULT_NAME_PROPERTY: &str = "name";
 
 impl Province {
   pub async fn load_mappings(
-    config: &Config,
+    config: &MapConfig,
   ) -> Result<HashMap<String, ProvinceMapping>, Box<dyn Error>> {
     let json_str = read_to_string(&config.province_mappings_path).await?;
     Ok(serde_json::from_str(&json_str)?)
   }
 
   pub async fn load_nation(
-    config: &Config,
+    config: &MapConfig,
     nation_id: String,
     mapping: Option<&ProvinceMapping>,
   ) -> Result<Option<Provinces>, Box<dyn Error>> {
-    let path = Path::new(&config.provinces_dir).join(nation_id.clone() + ".json");
+    let path = config
+      .provinces_dir
+      .clone()
+      .join(nation_id.clone() + ".geojson");
     if !path.exists() {
       return Ok(None);
     }
