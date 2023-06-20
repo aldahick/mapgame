@@ -8,16 +8,13 @@ on:
       - "v*"
 jobs:
   build_linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
       - name: Install SFML
         run: sudo apt-get update && sudo apt-get install -y libsfml-dev
       - name: Build
         run: cargo build --release
-        env:
-          CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
       - uses: actions/upload-artifact@v3
         with:
           name: mapgame-linux-x64
@@ -26,9 +23,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
       - name: Download SFML
         run: Invoke-WebRequest -OutFile sfml.zip https://www.sfml-dev.org/files/SFML-2.5.1-windows-vc15-64-bit.zip
       - name: Extract SFML
@@ -36,7 +30,6 @@ jobs:
       - name: Build
         run: cargo build --release
         env:
-          CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
           SFML_INCLUDE_DIR: ${{ github.workspace }}\SFML-2.5.1\include
           SFML_LIBS_DIR: ${{ github.workspace }}\SFML-2.5.1\lib
       - uses: actions/upload-artifact@v3

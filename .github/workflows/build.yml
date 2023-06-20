@@ -11,5 +11,3 @@ jobs:
         run: cargo fmt --all -- --check
       - name: Build
         run: cargo build
-        env:
-          CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
