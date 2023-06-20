@@ -46,10 +46,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: mapgame-windows-x64.exe
+          path: mapgame-windows-x64.exe
       - name: Download Linux x64 executable
         uses: actions/download-artifact@v3
         with:
           name: mapgame-linux-x64
+          path: mapgame-linux-x64
       - name: Publish release
         uses: softprops/action-gh-release@v1
         with:
