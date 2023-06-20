@@ -5,7 +5,7 @@ Play strategy, on a map.
 ## Playing
 
 1. Install [Rust](https://www.rust-lang.org/tools/install)
-2. Install [SFML](https://docs.rs/sfml/latest/sfml/). On Ubuntu, do `apt install libsfml-dev build-essential pkg-config libssl-dev`
+2. Install dependencies: `apt install libsfml-dev build-essential pkg-config`
 3. Execute `cargo run .`
 
 ## Todo

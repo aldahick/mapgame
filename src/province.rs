@@ -1,9 +1,8 @@
-use std::{collections::HashMap, error::Error};
+use std::{collections::HashMap, error::Error, fs::read_to_string};
 
 use geojson::{Feature, FeatureCollection, GeoJson};
 use serde::Deserialize;
 use sfml::graphics::{Color, Rect};
-use tokio::fs::read_to_string;
 
 use crate::{
   config::MapConfig,
@@ -26,14 +25,14 @@ pub type ProvinceMappings = HashMap<String, ProvinceMapping>;
 const DEFAULT_NAME_PROPERTY: &str = "name";
 
 impl Province {
-  pub async fn load_mappings(
+  pub fn load_mappings(
     config: &MapConfig,
   ) -> Result<HashMap<String, ProvinceMapping>, Box<dyn Error>> {
-    let json_str = read_to_string(&config.province_mappings_path).await?;
+    let json_str = read_to_string(&config.province_mappings_path)?;
     Ok(serde_json::from_str(&json_str)?)
   }
 
-  pub async fn load_nation(
+  pub fn load_nation(
     config: &MapConfig,
     nation_id: String,
     mapping: Option<&ProvinceMapping>,
@@ -45,7 +44,7 @@ impl Province {
     if !path.exists() {
       return Ok(None);
     }
-    let geojson_str = read_to_string(path).await?;
+    let geojson_str = read_to_string(path)?;
     let geojson = geojson_str.parse::<GeoJson>()?;
     let features = FeatureCollection::try_from(geojson)?;
     let bounds = Rect::new(0.0, 0.0, 100.0, 100.0);

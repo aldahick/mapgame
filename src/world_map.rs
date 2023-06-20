@@ -2,9 +2,8 @@ use sfml::{
   graphics::{RenderTarget, RenderWindow},
   system::Vector2f,
 };
-use tokio::fs::read_to_string;
 
-use std::{collections::HashMap, error::Error, ops::Deref};
+use std::{collections::HashMap, error::Error, fs::read_to_string, ops::Deref};
 
 use geojson::FeatureCollection;
 use sfml::graphics::Rect;
@@ -27,8 +26,8 @@ pub struct WorldMap {
 }
 
 impl WorldMap {
-  pub async fn new<'a>(config: &MapConfig) -> Result<WorldMap, Box<dyn Error>> {
-    let nations = WorldMap::load_nations(config).await?;
+  pub fn new<'a>(config: &MapConfig) -> Result<WorldMap, Box<dyn Error>> {
+    let nations = WorldMap::load_nations(config)?;
     Ok(WorldMap {
       name: config.name.clone(),
       nations,
@@ -62,7 +61,7 @@ impl WorldMap {
     geojson::FeatureCollection::try_from(geojson)
   }
 
-  async fn load_nations(config: &MapConfig) -> Result<Nations, Box<dyn Error>> {
+  fn load_nations(config: &MapConfig) -> Result<Nations, Box<dyn Error>> {
     if !config.nations_path.exists() {
       return Err(Box::new(MapLoadError {
         reason: format!(
@@ -71,13 +70,13 @@ impl WorldMap {
         ),
       }));
     }
-    let geojson_str = read_to_string(&config.nations_path).await?;
+    let geojson_str = read_to_string(&config.nations_path)?;
     let features = WorldMap::parse_features(geojson_str)?;
-    let province_mappings = Province::load_mappings(config).await?;
+    let province_mappings = Province::load_mappings(config)?;
     let bounds = Rect::new(0.0, 0.0, 100.0, 100.0);
     let mut nations = HashMap::new();
     for feature in features {
-      let nation = Nation::new(feature, &bounds, config, &province_mappings).await?;
+      let nation = Nation::new(feature, &bounds, config, &province_mappings)?;
       let nation_id = nation.id().clone();
       if nation.area() > MIN_NATION_AREA {
         nations.insert(nation_id, nation);
