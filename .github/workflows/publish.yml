@@ -17,7 +17,7 @@ jobs:
         run: cargo build --release
       - uses: actions/upload-artifact@v3
         with:
-          name: mapgame-linux-x64
+          name: linux-x64
           path: ./target/release/mapgame
   build_windows:
     runs-on: windows-latest
@@ -34,7 +34,7 @@ jobs:
           SFML_LIBS_DIR: ${{ github.workspace }}\SFML-2.5.1\lib
       - uses: actions/upload-artifact@v3
         with:
-          name: mapgame-windows-x64.exe
+          name: windows-x64
           path: ./target/release/mapgame.exe
   publish_release:
     runs-on: ubuntu-latest
@@ -42,19 +42,18 @@ jobs:
       - build_linux
       - build_windows
     steps:
-      - name: Download Windows x64 executable
+      - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: mapgame-windows-x64.exe
-          path: mapgame-windows-x64.exe
-      - name: Download Linux x64 executable
-        uses: actions/download-artifact@v3
-        with:
-          name: mapgame-linux-x64
-          path: mapgame-linux-x64
+          path: bin
+      - name: Move artifact files
+        run: |
+          mv bin/linux-x64/mapgame mapgame-linux-x64
+          mv bin/windows-x64/mapgame.exe mapgame-windows-x64.exe
       - name: Publish release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            mapgame-windows-x64.exe
             mapgame-linux-x64
+            mapgame-windows-x64.exe
+            
