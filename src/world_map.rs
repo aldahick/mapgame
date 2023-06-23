@@ -64,17 +64,18 @@ impl WorldMap {
 
   pub fn render(&self, window: &mut RenderWindow) {
     let highlight_id = self.highlighted_nation_id.clone().unwrap_or_default();
-    let mut highlight_nation: Option<&Box<Nation>> = None;
+    let mut highlight_nation_opt: Option<&Box<Nation>> = None;
     for (id, nation) in &self.nations {
       if id.as_str() == highlight_id {
-        highlight_nation = Some(nation);
+        highlight_nation_opt = Some(nation);
       } else {
         window.draw(nation.deref());
       }
     }
-    if highlight_nation.is_some() {
-      window.draw(highlight_nation.unwrap().deref());
-    }
+    highlight_nation_opt.and_then(|nation| {
+      window.draw(nation.deref());
+      Some(())
+    });
   }
 
   pub fn on_resize(&mut self, bounds: &Bounds) {

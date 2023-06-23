@@ -13,6 +13,7 @@ pub mod world_map;
 use std::error::Error;
 
 use config::get_available_maps;
+use errors::MapLoadError;
 use game::Game;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -20,7 +21,13 @@ fn main() -> Result<(), Box<dyn Error>> {
   if maps.len() != 1 {
     panic!("Only one map is currently supported. lol");
   }
-  let mut game = Game::new(maps.get(maps.keys().next().unwrap()).unwrap())?;
+  let map_name = maps.keys().next().ok_or_else(|| MapLoadError {
+    reason: "No maps found".to_string(),
+  })?;
+  let map = maps.get(map_name).ok_or_else(|| MapLoadError {
+    reason: format!("Map {} not found", map_name),
+  })?;
+  let mut game = Game::new(map)?;
   game.start();
   Ok(())
 }

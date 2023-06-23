@@ -75,12 +75,13 @@ impl Nation {
   pub fn on_resize(&mut self, bounds: &Bounds) {
     self.geo_drawable.on_resize(bounds);
     self.update_cached_vertices();
-    if self.provinces.is_some() {
-      for (_id, province) in self.provinces.as_mut().unwrap() {
+    self.provinces.as_mut().and_then(|provinces| {
+      for (_id, province) in provinces {
         province.geo_drawable.on_resize(bounds);
         province.update_cached_vertices();
       }
-    }
+      Some(())
+    });
   }
 
   pub fn update_cached_vertices(&mut self) {
@@ -101,11 +102,12 @@ impl Drawable for Nation {
     target: &mut dyn sfml::graphics::RenderTarget,
     states: &sfml::graphics::RenderStates<'texture, 'shader, 'shader_texture>,
   ) {
-    if self.provinces.is_some() {
-      for (_id, province) in self.provinces.as_ref().unwrap() {
+    self.provinces.as_ref().and_then(|provinces| {
+      for (_id, province) in provinces {
         province.geo_drawable.draw(target, states);
       }
-    }
+      Some(())
+    });
     self.geo_drawable.draw(target, states);
   }
 }

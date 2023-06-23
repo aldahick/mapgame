@@ -1,5 +1,7 @@
 use std::{collections::HashMap, error::Error, fs::read_dir, path::Path};
 
+use crate::errors::MapLoadError;
+
 pub struct MapConfig {
   pub name: String,
   pub nations_path: Box<Path>,
@@ -17,7 +19,11 @@ pub fn get_available_maps() -> Result<MapConfigs, Box<dyn Error>> {
   let mut maps = HashMap::new();
   let entries = read_dir(MAPS_DIR)?;
   for entry in entries {
-    let name = entry?.file_name().into_string().unwrap();
+    let name = entry?.file_name().into_string().or_else(|s| {
+      Err(MapLoadError {
+        reason: format!("failed to convert map file name to string: {:?}", s),
+      })
+    })?;
     let base_path = Path::new(MAPS_DIR).join(&name);
     let map = Box::new(MapConfig {
       name: name.clone(),

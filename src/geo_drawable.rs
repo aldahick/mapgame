@@ -74,18 +74,14 @@ impl GeoDrawable {
   }
 
   pub fn get_feature_property(feature: &Feature, key: &str) -> Option<String> {
-    let value = feature.property(key);
-    if value.is_none() {
-      return None;
-    }
-    match value.unwrap() {
+    feature.property(key).and_then(|value| match value {
       JsonValue::String(str) => Some(str.clone()),
       JsonValue::Array(_a) => None,
       JsonValue::Bool(_b) => None,
       JsonValue::Null => None,
       JsonValue::Number(n) => Some(n.to_string()),
       JsonValue::Object(_o) => None,
-    }
+    })
   }
 
   pub fn on_resize(&mut self, bounds: &Bounds) {
