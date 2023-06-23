@@ -18,12 +18,12 @@ pub fn get_available_maps() -> Result<MapConfigs, Box<dyn Error>> {
   let entries = read_dir(MAPS_DIR)?;
   for entry in entries {
     let name = entry?.file_name().into_string().unwrap();
-    let base_path = Path::new(MAPS_DIR).join(name.clone());
+    let base_path = Path::new(MAPS_DIR).join(&name);
     let map = Box::new(MapConfig {
       name: name.clone(),
-      nations_path: base_path.clone().join(NATIONS_FILE).into(),
-      province_mappings_path: base_path.clone().join(PROVINCE_MAPPINGS_FILE).into(),
-      provinces_dir: base_path.clone().join(PROVINCES_DIR).into(),
+      nations_path: base_path.join(NATIONS_FILE).into(),
+      province_mappings_path: base_path.join(PROVINCE_MAPPINGS_FILE).into(),
+      provinces_dir: base_path.join(PROVINCES_DIR).into(),
     });
     maps.insert(name, map);
   }

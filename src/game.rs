@@ -10,13 +10,13 @@ use crate::{config::MapConfig, player::Player, world_map::WorldMap};
 
 pub struct Game {
   window: RenderWindow,
-  world_map: WorldMap,
+  world_map: Box<WorldMap>,
   player: Box<Player>,
 }
 
 impl Game {
   pub fn new(config: &MapConfig) -> Result<Game, Box<dyn Error>> {
-    let world_map = WorldMap::new(config)?;
+    let world_map = Box::new(WorldMap::new(config)?);
     let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default());
     window.set_framerate_limit(60);
     let player = Player::new();
@@ -47,8 +47,8 @@ impl Game {
       Event::MouseMoved { x, y } => {
         self.on_mouse_move(Vector2f::new(x as f32, y as f32));
       }
-      Event::MouseButtonPressed { button, x: _, y: _ } => {
-        self.on_mouse_button_press(button);
+      Event::MouseButtonPressed { button, x, y } => {
+        self.on_mouse_button_press(button, Vector2f::new(x as f32, y as f32));
       }
       _ => {}
     }
@@ -76,17 +76,10 @@ impl Game {
     self.world_map.set_highlighted_nation_at(position);
   }
 
-  fn on_mouse_button_press(&mut self, button: Button) {
+  fn on_mouse_button_press(&mut self, button: Button, position: Vector2f) {
     if button == Button::Left && self.player.nation_id.is_none() {
-      let highlighted_nation = self.world_map.get_highlighted_nation();
-      if highlighted_nation.is_some() {
-        let old_selected_id = self.player.nation_id.clone();
-        let new_selected_id = highlighted_nation.unwrap().id();
-        self.player.nation_id = Some(new_selected_id.clone());
-        self
-          .world_map
-          .set_selected_nation(old_selected_id, new_selected_id.clone());
-      }
+      let new_nation_id = self.world_map.set_selected_nation_at(position);
+      self.player.nation_id = new_nation_id;
     }
   }
 }
