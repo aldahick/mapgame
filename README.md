@@ -5,23 +5,25 @@ Play strategy, on a map.
 ## Playing
 
 1. Install [Rust](https://www.rust-lang.org/tools/install)
-2. Install dependencies: `apt install libsfml-dev build-essential pkg-config`
-3. Execute `cargo run .`
+2. Install dependencies: `apt install build-essential pkg-config unzip`
+3. Download [SFML 2.6.0](https://www.sfml-dev.org/download/sfml/2.6.0/) and extract it to `./sfml`
+4. Execute `cargo run .`
 
 ## Todo
+
+This is a really long list.
 
 - [x] Continuous:
   - [x] Integration
   - [ ] Deployment (releases)
 - [ ] Nations
-  - [x] Download GeoJSON
   - [x] Load from GeoJSON
   - [ ] Color
 - [ ] Provinces
-  - [ ] Download GeoJSON
   - [x] Load from GeoJSON
 - [ ] View
   - [ ] Zoom
+- [ ] Basic UI components
 - [ ] Resources
 - [ ] Structures
   - [ ] Construction
@@ -40,7 +42,6 @@ Play strategy, on a map.
 - [ ] Cars
 - [ ] Boats
 - [ ] Planes
-- [ ] Networking
 - [ ] Multiplayer
 
 ## Credits

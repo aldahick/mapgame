@@ -50,6 +50,9 @@ impl Game {
       Event::MouseButtonPressed { button, x, y } => {
         self.on_mouse_button_press(button, Vector2f::new(x as f32, y as f32));
       }
+      Event::MouseWheelScrolled { delta, x, y, .. } => {
+        self.on_mouse_wheel_scroll(delta, Vector2f::new(x as f32, y as f32));
+      }
       _ => {}
     }
   }
@@ -81,5 +84,10 @@ impl Game {
       let new_nation_id = self.world_map.set_selected_nation_at(position);
       self.player.nation_id = new_nation_id;
     }
+  }
+
+  fn on_mouse_wheel_scroll(&mut self, delta: f32, position: Vector2f) {
+    let zoom = self.world_map.get_zoom();
+    self.world_map.set_zoom(zoom + delta * 0.1);
   }
 }

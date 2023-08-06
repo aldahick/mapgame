@@ -10,4 +10,4 @@ publish = false
 geojson = "0.24.1"
 serde = "1.0.164"
 serde_json = "1.0.97"
-sfml = "0.20.0"
+sfml = "0.21.0"

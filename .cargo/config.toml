@@ -1,2 +1,6 @@
 [registries.crates-io]
 protocol = "sparse"
+
+[env]
+SFML_INCLUDE_DIR = "sfml/include"
+SFML_LIBS_DIR = "sfml/lib"
