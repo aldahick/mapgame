@@ -2,5 +2,6 @@
 protocol = "sparse"
 
 [env]
-SFML_INCLUDE_DIR = "sfml/include"
-SFML_LIBS_DIR = "sfml/lib"
+SFML_INCLUDE_DIR = { value = "sfml/include", relative = true }
+SFML_LIBS_DIR = { value = "sfml/lib", relative = true }
+SFML_STATIC = "true"
