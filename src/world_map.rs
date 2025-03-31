@@ -71,18 +71,14 @@ impl WorldMap {
   }
 
   pub fn render(&self, window: &mut RenderWindow) {
-    let highlight_id = self.highlighted_nation_id.clone().unwrap_or_default();
-    let mut highlight_nation_opt: Option<&Box<Nation>> = None;
-    for (id, nation) in &self.nations {
-      if id.as_str() == highlight_id {
-        highlight_nation_opt = Some(nation);
-      } else {
-        window.draw(nation.deref());
-      }
-    }
-    highlight_nation_opt.and_then(|nation| {
+    for nation in self.nations.values() {
       window.draw(nation.deref());
-      Some(())
+    }
+    self.highlighted_nation_id.clone().and_then(|nation_id| {
+      self.nations.get(&nation_id).and_then(|nation| {
+        window.draw(nation.deref());
+        Some(())
+      })
     });
   }
 
@@ -93,17 +89,16 @@ impl WorldMap {
   }
 
   /* Highlights the nation at `position` and unhighlights all others, returning the highlighted nation ID (if any) */
-  pub fn set_highlighted_nation_at(&mut self, position: Vector2f) -> Option<&String> {
-    let mut highlighted_id = None;
+  pub fn set_highlighted_nation_at(&mut self, position: Vector2f) -> &Option<String> {
     for (id, nation) in self.nations.iter_mut() {
       if nation.includes(position) {
         nation.set_highlighted(true);
-        highlighted_id = Some(id);
+        self.highlighted_nation_id = Some(id.clone());
       } else if nation.is_highlighted() {
         nation.set_highlighted(false);
       }
     }
-    highlighted_id
+    &self.highlighted_nation_id
   }
 
   pub fn get_highlighted_nation(&self) -> Option<&Box<Nation>> {

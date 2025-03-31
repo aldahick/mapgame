@@ -90,7 +90,7 @@ impl Game {
     }
   }
 
-  fn on_mouse_wheel_scroll(&mut self, delta: f32, position: Vector2f) {
+  fn on_mouse_wheel_scroll(&mut self, delta: f32, _position: Vector2f) {
     let zoom = self.world_map.get_zoom();
     self.world_map.set_zoom(zoom + delta * 0.1);
   }
