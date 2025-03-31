@@ -21,7 +21,7 @@ pub struct WorldMap {
   nations: Nations,
   highlighted_nation_id: Option<String>,
   // 0,0 is the middle of the window, so this can be negative
-  view_center: Vector2f,
+  _view_center: Vector2f,
   // minimum 1, as this is the scale factor by which to zoom the map.
   pub zoom: f32,
 }
@@ -32,7 +32,7 @@ impl WorldMap {
     Ok(WorldMap {
       nations,
       highlighted_nation_id: None,
-      view_center: Vector2f::new(0.0, 0.0),
+      _view_center: Vector2f::new(0.0, 0.0),
       zoom: 1.0,
     })
   }
