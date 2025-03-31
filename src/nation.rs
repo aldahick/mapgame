@@ -28,7 +28,7 @@ impl Nation {
     config: &MapConfig,
     province_mappings: &ProvinceMappings,
   ) -> Result<Box<Nation>, Box<dyn Error>> {
-    let geo_drawable = GeoDrawable::new(feature, bounds, "ADMIN", Some("ISO_A3"))?;
+    let geo_drawable = GeoDrawable::new(feature, bounds, "name", Some("id"))?;
     let nation_id = geo_drawable.id.clone();
     let province_mapping = province_mappings.get(&nation_id);
     let provinces = Province::load_nation(config, nation_id, province_mapping)?;
