@@ -1,15 +1,17 @@
 use std::error::Error;
 
 use sfml::{
+  cpp::FBox,
   graphics::{Color, Rect, RenderTarget, RenderWindow, View},
   system::Vector2f,
   window::{mouse::Button, Event, Style},
+  SfResult,
 };
 
 use crate::{config::MapConfig, player::Player, world_map::WorldMap};
 
 pub struct Game {
-  window: RenderWindow,
+  window: FBox<RenderWindow>,
   world_map: Box<WorldMap>,
   player: Box<Player>,
 }
@@ -17,7 +19,7 @@ pub struct Game {
 impl Game {
   pub fn new(config: &MapConfig) -> Result<Game, Box<dyn Error>> {
     let world_map = Box::new(WorldMap::new(config)?);
-    let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default());
+    let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default())?;
     window.set_framerate_limit(60);
     let player = Player::new();
     Ok(Game {
@@ -41,9 +43,9 @@ impl Game {
   fn on_event(&mut self, event: Event) {
     match event {
       Event::Closed => self.on_close(),
-      Event::Resized { width, height } => {
-        self.on_resize(Rect::new(0.0, 0.0, width as f32, height as f32))
-      }
+      Event::Resized { width, height } => self
+        .on_resize(Rect::new(0.0, 0.0, width as f32, height as f32))
+        .unwrap_or(()),
       Event::MouseMoved { x, y } => {
         self.on_mouse_move(Vector2f::new(x as f32, y as f32));
       }
@@ -61,9 +63,11 @@ impl Game {
     self.window.close();
   }
 
-  fn on_resize(&mut self, bounds: Rect<f32>) {
-    self.window.set_view(&View::from_rect(bounds));
+  fn on_resize(&mut self, bounds: Rect<f32>) -> SfResult<()> {
+    let view = View::from_rect(bounds)?;
+    self.window.set_view(&view);
     self.world_map.on_resize(&bounds);
+    Ok(())
   }
 
   fn on_mouse_move(&mut self, position: Vector2f) {

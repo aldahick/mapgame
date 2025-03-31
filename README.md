@@ -5,9 +5,10 @@ Play strategy, on a map.
 ## Playing
 
 1. Install [Rust](https://www.rust-lang.org/tools/install)
-2. Install dependencies: `apt install build-essential pkg-config unzip`
+2. Install dependencies: `apt install build-essential pkg-config unzip cmake`
+  - Also see [rust-sfml](https://github.com/jeremyletang/rust-sfml#prerequisites)'s dependencies.
 3. Download [SFML 2.6.0](https://www.sfml-dev.org/download/sfml/2.6.0/) and extract it to `./sfml`
-4. Execute `cargo run .`
+4. Execute `cargo run`
 
 ## Todo
 
@@ -23,6 +24,7 @@ This is a really long list.
   - [x] Load from GeoJSON
 - [ ] View
   - [ ] Zoom
+  - [ ] Map modes
 - [ ] Basic UI components
 - [ ] Resources
 - [ ] Structures
