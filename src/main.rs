@@ -1,4 +1,4 @@
-#![deny(elided_lifetimes_in_paths)]
+// #![deny(elided_lifetimes_in_paths)]
 
 pub mod config;
 pub mod errors;
@@ -10,24 +10,13 @@ pub mod player;
 pub mod province;
 pub mod world_map;
 
+use config::get_config;
+use game::Game;
 use std::error::Error;
 
-use config::get_available_maps;
-use errors::MapLoadError;
-use game::Game;
-
 fn main() -> Result<(), Box<dyn Error>> {
-  let maps = get_available_maps()?;
-  if maps.len() != 1 {
-    panic!("Only one map is currently supported. lol");
-  }
-  let map_name = maps.keys().next().ok_or_else(|| MapLoadError {
-    reason: "No maps found".to_string(),
-  })?;
-  let map = maps.get(map_name).ok_or_else(|| MapLoadError {
-    reason: format!("Map {} not found", map_name),
-  })?;
-  let mut game = Game::new(map)?;
+  let config = get_config()?;
+  let mut game = Game::new(config)?;
   game.start();
   Ok(())
 }

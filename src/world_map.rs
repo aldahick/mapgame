@@ -1,12 +1,10 @@
+use geojson::FeatureCollection;
+use sfml::graphics::Rect;
 use sfml::{
   graphics::{RenderTarget, RenderWindow},
   system::Vector2f,
 };
-
 use std::{collections::HashMap, error::Error, fs::read_to_string, ops::Deref};
-
-use geojson::FeatureCollection;
-use sfml::graphics::Rect;
 
 use crate::{
   config::MapConfig,
@@ -19,15 +17,13 @@ use crate::{
 // simply too many nations. this will be removed
 pub const MIN_NATION_AREA: f32 = 0.25;
 
-const MIN_ZOOM: f32 = 1.0;
-
 pub struct WorldMap {
   nations: Nations,
   highlighted_nation_id: Option<String>,
   // 0,0 is the middle of the window, so this can be negative
   view_center: Vector2f,
   // minimum 1, as this is the scale factor by which to zoom the map.
-  zoom: f32,
+  pub zoom: f32,
 }
 
 impl WorldMap {
@@ -136,17 +132,5 @@ impl WorldMap {
 
   fn get_nation_mut(&mut self, id: &String) -> Option<&mut Box<Nation>> {
     self.nations.get_mut(id)
-  }
-
-  pub fn get_zoom(&self) -> f32 {
-    self.zoom
-  }
-
-  pub fn set_zoom(&mut self, value: f32) {
-    if value < MIN_ZOOM {
-      self.zoom = MIN_ZOOM;
-    } else {
-      self.zoom = value;
-    }
   }
 }

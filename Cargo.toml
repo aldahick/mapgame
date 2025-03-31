@@ -7,7 +7,7 @@ license = "MIT"
 publish = false
 
 [dependencies]
-geojson = "0.24.2"
-serde = "1.0.219"
-serde_json = "1.0.140"
-sfml = "0.24.0"
+geojson = "0.24"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sfml = "0.24"

@@ -1,16 +1,14 @@
-use std::{collections::HashMap, error::Error};
-
-use geojson::Feature;
-use sfml::{
-  graphics::{Color, Drawable},
-  system::Vector2f,
-};
-
 use crate::{
   config::MapConfig,
   geo_drawable::{Bounds, GeoDrawable},
   province::{Province, ProvinceMappings, Provinces},
 };
+use geojson::Feature;
+use sfml::{
+  graphics::{Color, Drawable},
+  system::Vector2f,
+};
+use std::{collections::HashMap, error::Error};
 
 #[derive(Debug)]
 pub struct Nation {

@@ -1,8 +1,7 @@
-use std::{collections::HashMap, error::Error, fs::read_to_string};
-
 use geojson::{Feature, FeatureCollection, GeoJson};
 use serde::Deserialize;
 use sfml::graphics::{Color, Rect};
+use std::{collections::HashMap, error::Error, fs::read_to_string};
 
 use crate::{
   config::MapConfig,

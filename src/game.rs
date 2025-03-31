@@ -1,5 +1,4 @@
-use std::error::Error;
-
+use crate::{config::Config, player::Player, world_map::WorldMap};
 use sfml::{
   cpp::FBox,
   graphics::{Color, Rect, RenderTarget, RenderWindow, View},
@@ -7,22 +6,23 @@ use sfml::{
   window::{mouse::Button, Event, Style},
   SfResult,
 };
-
-use crate::{config::MapConfig, player::Player, world_map::WorldMap};
+use std::error::Error;
 
 pub struct Game {
+  config: Config,
   window: FBox<RenderWindow>,
   world_map: Box<WorldMap>,
   player: Box<Player>,
 }
 
 impl Game {
-  pub fn new(config: &MapConfig) -> Result<Game, Box<dyn Error>> {
-    let world_map = Box::new(WorldMap::new(config)?);
+  pub fn new(config: Config) -> Result<Game, Box<dyn Error>> {
+    let world_map = Box::new(WorldMap::new(&config.map)?);
     let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default())?;
     window.set_framerate_limit(60);
     let player = Player::new();
     Ok(Game {
+      config,
       window,
       world_map,
       player,
@@ -91,7 +91,6 @@ impl Game {
   }
 
   fn on_mouse_wheel_scroll(&mut self, delta: f32, _position: Vector2f) {
-    let zoom = self.world_map.get_zoom();
-    self.world_map.set_zoom(zoom + delta * 0.1);
+    self.world_map.zoom = f32::max(self.config.view.min_zoom, self.world_map.zoom + delta * 0.1);
   }
 }
