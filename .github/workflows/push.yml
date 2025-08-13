@@ -8,13 +8,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Install SFML
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential cmake \
-            libsfml-dev libudev-dev libopenal-dev libvorbis-dev \
-            libflac-dev libx11-dev libxrandr-dev libxcursor-dev \
-            libgl-dev libfreetype-dev
-
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: build-essential cmake libsfml-dev libudev-dev libopenal-dev libvorbis-dev libflac-dev libx11-dev libxrandr-dev libxcursor-dev libgl-dev libfreetype-dev
       - name: Lint
         if: ${{ github.ref_type == 'branch' }}
         run: cargo fmt --all -- --check
@@ -34,14 +30,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download SFML
-        run: Invoke-WebRequest -OutFile sfml.zip https://www.sfml-dev.org/files/SFML-2.6.2-windows-vc17-64-bit.zip
+        run: Invoke-WebRequest -OutFile sfml.zip https://github.com/SFML/SFML/releases/download/2.6.2/SFML-2.6.2-windows-vc17-64-bit.zip
       - name: Extract SFML
         run: Expand-Archive -DestinationPath . .\sfml.zip
 
       - name: Get CMake and Ninja
         uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: '3.25'
+          cmakeVersion: '3.31'
           ninjaVersion: latest
       - name: Build
         run: cargo build ${{ github.ref_type == 'tag' && '--release' || '' }}
