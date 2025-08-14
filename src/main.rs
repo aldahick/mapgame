@@ -1,4 +1,6 @@
-// #![deny(elided_lifetimes_in_paths)]
+#[cfg(target_os = "windows")]
+#[link(name = "Advapi32")]
+unsafe extern "system" {}
 
 pub mod config;
 pub mod errors;

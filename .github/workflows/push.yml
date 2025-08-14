@@ -1,5 +1,5 @@
 name: CI
-run-name: ${{ github.ref_type == 'tag' && format('Release {0}', github.ref_name) || format('Build {0}', github.event.head_commit.message) }}
+run-name: ${{ github.ref_type == 'tag' && format('Release "{0}"', github.ref_name) || format('Build "{0}"', github.event.head_commit.message) }}
 on: push
 jobs:
   build-linux:
