@@ -1,10 +1,10 @@
 use crate::{config::Config, player::Player, world_map::WorldMap};
 use sfml::{
+  SfResult,
   cpp::FBox,
   graphics::{Color, Rect, RenderTarget, RenderWindow, View},
   system::Vector2f,
-  window::{mouse::Button, Event, Style},
-  SfResult,
+  window::{Event, Style, mouse::Button},
 };
 use std::error::Error;
 
@@ -17,10 +17,12 @@ pub struct Game {
 
 impl Game {
   pub fn new(config: Config) -> Result<Game, Box<dyn Error>> {
-    let world_map = Box::new(WorldMap::new(&config.map)?);
+    let mut world_map = Box::new(WorldMap::new(&config.map)?);
     let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default())?;
     window.set_framerate_limit(60);
     let player = Player::new();
+    let size = Rect::new(0f32, 0f32, 1920f32, 1080f32);
+    world_map.on_resize(&size);
     Ok(Game {
       config,
       window,

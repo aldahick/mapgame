@@ -1,0 +1,78 @@
+name: CI
+run-name: ${{ github.ref_type == 'tag' && format('Release "{0}"', github.ref_name) || format('Build "{0}"', github.event.head_commit.message) }}
+on: push
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install SFML
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: build-essential cmake libsfml-dev libudev-dev libopenal-dev libvorbis-dev libflac-dev libx11-dev libxrandr-dev libxcursor-dev libgl-dev libfreetype-dev
+      - name: Lint
+        if: ${{ github.ref_type == 'branch' }}
+        run: cargo fmt --all -- --check
+
+      - name: Build
+        run: cargo build ${{ github.ref_type == 'tag' && '--release' || '' }}
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ github.ref_type == 'tag' }}
+        with:
+          name: linux-x64
+          path: ./target/release/mapgame
+
+  build-windows:
+    runs-on: windows-latest
+    if: ${{ github.ref_type == 'tag' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download SFML
+        run: Invoke-WebRequest -OutFile sfml.zip https://github.com/SFML/SFML/releases/download/2.6.2/SFML-2.6.2-windows-vc17-64-bit.zip
+      - name: Extract SFML
+        run: Expand-Archive -DestinationPath . .\sfml.zip
+
+      - name: Get CMake and Ninja
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: '3.31'
+          ninjaVersion: latest
+      - name: Build
+        run: cargo build ${{ github.ref_type == 'tag' && '--release' || '' }}
+        env:
+          SFML_INCLUDE_DIR: ${{ github.workspace }}\SFML-2.6.2\include
+          SFML_LIBS_DIR: ${{ github.workspace }}\SFML-2.6.2\lib
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ github.ref_type == 'tag' }}
+        with:
+          name: windows-x64
+          path: ./target/release/mapgame.exe
+
+  publish-release:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref_type == 'tag' }}
+    needs:
+      - build-linux
+      - build-windows
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: bin
+      - name: Move artifact files
+        run: |
+          mv bin/linux-x64/mapgame mapgame-linux-x64
+          mv bin/windows-x64/mapgame.exe mapgame-windows-x64.exe
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            mapgame-linux-x64
+            mapgame-windows-x64.exe
