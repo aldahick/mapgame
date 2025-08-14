@@ -17,10 +17,12 @@ pub struct Game {
 
 impl Game {
   pub fn new(config: Config) -> Result<Game, Box<dyn Error>> {
-    let world_map = Box::new(WorldMap::new(&config.map)?);
+    let mut world_map = Box::new(WorldMap::new(&config.map)?);
     let mut window = RenderWindow::new((1920, 1080), "mapgame", Style::CLOSE, &Default::default())?;
     window.set_framerate_limit(60);
     let player = Player::new();
+    let size = Rect::new(0f32, 0f32, 1920f32, 1080f32);
+    world_map.on_resize(&size);
     Ok(Game {
       config,
       window,

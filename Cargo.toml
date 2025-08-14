@@ -1,6 +1,6 @@
 [package]
 name = "mapgame"
-version = "0.1.0"
+version = "0.0.8"
 authors = ["Alex Hicks <alex@alexhicks.net>"]
 edition = "2024"
 license = "MIT"
