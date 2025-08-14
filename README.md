@@ -6,8 +6,8 @@ Play strategy, on a map.
 
 1. Install [Rust](https://www.rust-lang.org/tools/install)
 2. Install dependencies: `apt install build-essential pkg-config unzip cmake`
-  - Also see [rust-sfml](https://github.com/jeremyletang/rust-sfml#prerequisites)'s dependencies.
-3. Download [SFML 2.6.0](https://www.sfml-dev.org/download/sfml/2.6.0/) and extract it to `./sfml`
+  a. Also see [rust-sfml](https://github.com/jeremyletang/rust-sfml#prerequisites)'s dependencies.
+3. Download [SFML 2.6.2](https://github.com/SFML/SFML/releases/2.6.2) and extract it to `./sfml`
 4. Execute `cargo run`
 
 ## Todo

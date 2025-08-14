@@ -1,6 +1,7 @@
 name: CI
 run-name: ${{ github.ref_type == 'tag' && format('Release "{0}"', github.ref_name) || format('Build "{0}"', github.event.head_commit.message) }}
 on: push
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -26,6 +27,7 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
+    if: ${{ github.ref_type == 'tag' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -57,6 +59,8 @@ jobs:
     needs:
       - build-linux
       - build-windows
+    permissions:
+      contents: write
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
