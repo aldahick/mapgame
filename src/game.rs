@@ -1,10 +1,10 @@
 use crate::{config::Config, player::Player, world_map::WorldMap};
 use sfml::{
+  SfResult,
   cpp::FBox,
   graphics::{Color, Rect, RenderTarget, RenderWindow, View},
   system::Vector2f,
-  window::{mouse::Button, Event, Style},
-  SfResult,
+  window::{Event, Style, mouse::Button},
 };
 use std::error::Error;
 

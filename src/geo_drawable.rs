@@ -2,7 +2,7 @@ use crate::{
   errors::MapLoadError,
   math::{polygon_area, polygon_contains},
 };
-use geojson::{feature::Id, Feature, JsonValue, Value};
+use geojson::{Feature, JsonValue, Value, feature::Id};
 use sfml::{
   graphics::{Color, PrimitiveType, Rect, RenderStates, Vertex},
   system::Vector2f,
